@@ -1,0 +1,27 @@
+# run to install: conda env create --file environment.yml
+# run to update: conda env update --name myenv --file environment.yml --prune
+name: py_ml_packaging_classification
+
+channels:
+
+dependencies:
+# conda installation
+- python=3.10
+- anaconda>=22.9.0
+- pip
+- numpy>=1.22
+- matplotlib
+- pandas>=1.4
+- pandas-datareader
+- scikit-learn>=1.1
+- scipy
+- seaborn
+- lightgbm
+- pip:
+  # pip installation
+  - black
+  - 'black[jupyter]'
+  - pandasql
+  - pyspark
+  - optuna
+  - mlflow
