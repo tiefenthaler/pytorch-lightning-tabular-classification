@@ -17,11 +17,11 @@ dependencies:
 - scipy
 - seaborn
 - lightgbm
+- pytorch
+- lightning
 - pip:
   # pip installation
   - black
   - 'black[jupyter]'
-  - pandasql
-  - pyspark
   - optuna
   - mlflow
