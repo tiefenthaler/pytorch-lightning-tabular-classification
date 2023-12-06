@@ -19,9 +19,9 @@ def check_model_learning_CV(
     y: pd.DataFrame,
     preprocess_pipeline: sklearn.pipeline.Pipeline,
     label_encoder: sklearn.preprocessing.LabelEncoder,
-    random_state: int = None
+    random_state: int = None,
 ) -> tuple[ndarray, ndarray, StratifiedKFold]:
-    """Perform cross validation on a given model to analyze the degree of overfitting and underfitting. 
+    """Perform cross validation on a given model to analyze the degree of overfitting and underfitting.
     This is achieved by evaluating the macro average f1-score on the training and test sets for each fold.
     The function also returns the used StratifiedKFold object for potential further uses.
     NOTE: moved inside a function, since transformations and training should not be puplic available
@@ -34,7 +34,7 @@ def check_model_learning_CV(
         y (pd.DataFrame): The target output data to be used for model training and evaluation.
         preprocess_pipeline (sklearn.pipeline.Pipeline): The preprocessing pipeline to be applied on the input data before fitting the model.
         label_encoder (sklearn.preprocessing.LabelEncoder): Fitted label encoder for target variable.
-        random_state(int): Controls the shuffling applied to the data before applying the split. 
+        random_state(int): Controls the shuffling applied to the data before applying the split.
             Pass an int for reproducible output across multiple function calls.
             Default is None.
 
@@ -65,8 +65,16 @@ def check_model_learning_CV(
         y_test_pred = model.predict(X_test_transformed)
 
         # get performance results for given split
-        report_train.append(classification_report(y_train_transfomed, y_train_pred, output_dict=True)['macro avg']['f1-score'])
-        report_test.append(classification_report(y_test_transformed, y_test_pred, output_dict=True)['macro avg']['f1-score'])
+        report_train.append(
+            classification_report(
+            y_train_transfomed, y_train_pred, output_dict=True
+            )["macro avg"]["f1-score"]
+        )
+        report_test.append(
+            classification_report(y_test_transformed, y_test_pred, output_dict=True)[
+                "macro avg"
+            ]["f1-score"]
+        )
 
     performance_train = np.array(report_train)
     performance_test = np.array(report_test)
@@ -77,8 +85,8 @@ def check_model_learning_CV(
 def calculate_weighted_cost(
     conf_matrix: np.ndarray,
     cost_matrix: List[List[float]],
-    method: str = 'macro',
-    class_weights: Optional[Dict[int, float]] = None
+    method: str = "macro",
+    class_weights: Optional[Dict[int, float]] = None,
 ) -> float:
     """This function calculates the weighted cost for a multi-class classification model based on different averaging methods.
     Function's logic:
@@ -155,32 +163,47 @@ def calculate_weighted_cost(
 
     # Check if class_weights match the classes from conf_matrix
     if class_weights:
-        assert len(class_weights) == conf_matrix.shape[0], "Mismatch between class weights and confusion matrix classes."
+        assert (
+            len(class_weights) == conf_matrix.shape[0]
+        ), "Mismatch between class weights and confusion matrix classes."
 
     FP = conf_matrix.sum(axis=0) - np.diag(conf_matrix)
     FN = conf_matrix.sum(axis=1) - np.diag(conf_matrix)
     TP = np.diag(conf_matrix)
     TN = conf_matrix.sum() - (FP + FN + TP)
 
-    if method == 'macro':
+    if method == "macro":
         cost = np.mean(cost_TP * TP + cost_FN * FN + cost_FP * FP + cost_TN * TN)
 
-    elif method == 'weighted':
+    elif method == "weighted":
         if not class_weights:
-            weights = np.sum(conf_matrix, axis=1) / np.sum(conf_matrix)  # class distribution
+            weights = np.sum(conf_matrix, axis=1) / np.sum(
+                conf_matrix
+            )  # class distribution
         else:
             # Convert class_weights dict to array in the order of classes in the confusion matrix
-            weights = np.array([list(class_weights.values())[i] for i in range(conf_matrix.shape[0])])
-        cost = np.sum(weights * (cost_TP * TP + cost_FN * FN + cost_FP * FP + cost_TN * TN))
+            weights = np.array(
+                [list(class_weights.values())[i] for i in range(conf_matrix.shape[0])]
+            )
+        cost = np.sum(
+            weights * (cost_TP * TP + cost_FN * FN + cost_FP * FP + cost_TN * TN)
+        )
 
-    elif method == 'micro':
+    elif method == "micro":
         total_TP = np.sum(TP)
         total_FP = np.sum(FP)
         total_FN = np.sum(FN)
         total_TN = np.sum(TN)
-        cost = cost_TP * total_TP + cost_FN * total_FN + cost_FP * total_FP + cost_TN * total_TN
+        cost = (
+            cost_TP * total_TP
+            + cost_FN * total_FN
+            + cost_FP * total_FP
+            + cost_TN * total_TN
+        )
 
     else:
-        raise ValueError(f"Unsupported method: {method}. Choose from 'macro', 'weighted', or 'micro'.")
+        raise ValueError(
+            f"Unsupported method: {method}. Choose from 'macro', 'weighted', or 'micro'."
+        )
 
     return round(cost, 2)
