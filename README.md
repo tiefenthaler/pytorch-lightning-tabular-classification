@@ -30,6 +30,7 @@ The repo focuses on the following aspects:
     - Consideration of class values from a business perspective using profit curves and under consideration of thresholds.
 - Build a production pipeline (training & inference) for best model to provide final results.
 
+**Python:** [sklearn](https://scikit-learn.org/stable/) | [auto-sklearn](https://automl.github.io/auto-sklearn/master/) | [LightGBM](https://lightgbm.readthedocs.io/en/stable/) | [PyTorch/Lightning](https://lightning.ai/pytorch-lightning) | [MLflow](https://mlflow.org/) | [Optuna](https://optuna.org/)
 
 # Use case description:
 To reach sustainability goals for the packaging of products, the company needs to know to which packaging categories the single items belong to. Since this information is not given for 7.058 items of the total 90.035, the goal is to provide the categories for the items with missing ones based on a data-driven approach.  
