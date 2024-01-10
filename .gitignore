@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__
 env_vars.yml
+
+notebooks/AutogluonModels
+notebooks/mlruns
