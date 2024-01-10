@@ -1,0 +1,8 @@
+services:   # Top level element to configure the argutments of multiple services
+  project:  # Service for which configurations are defined
+    image: devcontainer-automatedpackagingcategories  # (optinal) explicite way to define the image name
+    build: .  # Path to Dockerfile
+    volumes:  # Volumes are persistent data stores (outside container), mounted to be usable by the container
+      - ..:/project  # Map local directory (relative path to local project directory) to /project in the container
+    # ports:
+    #   - "8000:8000"  # Expose ports if necessary (e.g., for web applications)
