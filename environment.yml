@@ -1,17 +1,23 @@
 # run to install: conda env create --file environment.yml
 # run to update: conda env update --name myenv --file environment.yml --prune
+# run using mamba to install: mamba env create -f environment.yml
 name: py_ml_packaging_classification
 
 channels:
+- conda-forge
+- pytorch
 
 dependencies:
 # conda installation
-- python=3.10
-- anaconda>=22.9.0
+- python>=3.10,<3.12
+- ipython_genutils
+- ipykernel
+- jupyterlab
 - pip
+# - mamba
 - numpy>=1.22
 - matplotlib
-- pandas>=1.4
+- pandas>=2.0
 - pandas-datareader
 - scikit-learn>=1.1
 - scipy
@@ -19,9 +25,11 @@ dependencies:
 - lightgbm
 - pytorch
 - lightning
+- optuna
+- imbalanced-learn
+- mlflow
+- autogluon
 - pip:
   # pip installation
   - black
   - 'black[jupyter]'
-  - optuna
-  - mlflow
