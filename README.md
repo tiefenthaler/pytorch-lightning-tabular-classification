@@ -51,4 +51,4 @@ First analysis has shown that simple 1:1 relationships and rule-based approaches
 As the showcase is intended to reflect the data science process to taggle the use case, the structure builds up on this.
 
 **Code structure**
-tree
+directory-tree
