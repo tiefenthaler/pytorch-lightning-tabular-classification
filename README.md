@@ -14,6 +14,10 @@ The repo focuses on the following aspects:
 - Builde multiple machine learning pipelines to evaluate best classification performance. The following aspects are considered within those pipelines:
   - Benchmarking pipelines to compare performance of multiple different types of models:
     - A basic benchmarking pipeline using naive classifiers as a base line.
+    - A AutoML (automated machine learning) pipeline using PyCaret to compare a "large" variety of machine learning algorithms, considering:
+      - including and excluding custom data pre-processing
+      - pre-defined hyper-parameter set for each algorithm by PyCaret
+      - using random search for HPO (hyper-parameter optimization) with a pre-defined hyper-parameter search space for each algorithm by PyCaret
     - A AutoML (automated machine learning) pipeline using AutoGluon.Tablular, considering:
       - including and excluding custom data pre-processing
       - including auto pre-processing by AutoGluon.Tabular
@@ -40,7 +44,7 @@ The repo focuses on the following aspects:
     - Consideration of class values from a business perspective using profit curves and under consideration of thresholds.
 - Build a production pipeline (training & inference) for best model to provide final results.
 
-**Python:** [sklearn](https://scikit-learn.org/stable/) | [AutoGluon.Tabular](https://auto.gluon.ai/stable/tutorials/tabular/index.html) | [LightGBM](https://lightgbm.readthedocs.io/en/stable/) | [PyTorch/Lightning](https://lightning.ai/pytorch-lightning) | [MLflow](https://mlflow.org/) | [Optuna](https://optuna.org/)
+**Python:** [sklearn](https://scikit-learn.org/stable/) | [PyCaret](https://pycaret.gitbook.io/docs) | [AutoGluon.Tabular](https://auto.gluon.ai/stable/tutorials/tabular/index.html) | [LightGBM](https://lightgbm.readthedocs.io/en/stable/) | [PyTorch/Lightning](https://lightning.ai/pytorch-lightning) | [MLflow](https://mlflow.org/) | [Optuna](https://optuna.org/)
 
 # Use case description:
 To reach sustainability goals for the packaging of products, the company needs to know to which packaging categories the single items belong to. Since this information is not given for 7.058 items of the total 90.035, the goal is to provide the categories for the items with missing ones based on a data-driven approach.  
