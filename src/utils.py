@@ -10,6 +10,45 @@ import sklearn.pipeline
 from sklearn.base import BaseEstimator
 # from sklearn.metrics import mean_squared_error
 from sklearn.metrics import classification_report
+from sklearn.metrics import fbeta_score
+
+def f1_score_macro(
+    y_true,
+    y_pred,
+    *,
+    labels=None,
+    pos_label=1,
+    average="macro",
+    sample_weight=None,
+    zero_division="warn",
+):
+    """Compute the F1 score, also known as balanced F-score or F-measure.
+
+    The F1 score can be interpreted as a harmonic mean of the precision and
+    recall, where an F1 score reaches its best value at 1 and worst score at 0.
+    The relative contribution of precision and recall to the F1 score are
+    equal. The formula for the F1 score is:
+
+    .. math::
+        \\text{F1} = \\frac{2 * \\text{TP}}{2 * \\text{TP} + \\text{FP} + \\text{FN}}
+
+    Where :math:`\\text{TP}` is the number of true positives, :math:`\\text{FN}` is the
+    number of false negatives, and :math:`\\text{FP}` is the number of false positives.
+    F1 is by default
+    calculated as 0.0 when there are no true positives, false negatives, or
+    false positives.
+    """
+
+    return fbeta_score(
+        y_true,
+        y_pred,
+        beta=1,
+        labels=labels,
+        pos_label=pos_label,
+        average=average,
+        sample_weight=sample_weight,
+        zero_division=zero_division,
+    )
 
 
 def check_model_learning_CV(

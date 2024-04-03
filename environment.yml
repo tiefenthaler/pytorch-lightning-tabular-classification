@@ -29,6 +29,7 @@ dependencies:
 - optuna
 - imbalanced-learn
 - mlflow
+- pycaret>=3.0
 - autogluon
 - pip:
   # pip installation
