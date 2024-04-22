@@ -1,5 +1,5 @@
 services:   # Top level element to configure the arguments of multiple services
-  project:  # Project/Application for which configurations are defined
+  myproject:  # Project/Application for which configurations are defined
     image: devcontainer-automatedpackagingcategories  # (optinal) explicite way to define the image name
     build: .  # Path to Dockerfile
     volumes:  # Volumes are persistent data stores (outside container), mounted to be usable by the container
