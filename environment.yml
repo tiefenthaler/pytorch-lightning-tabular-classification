@@ -12,9 +12,11 @@ dependencies:
 - python>=3.10,<3.12
 - ipython_genutils
 - ipykernel
+- ipywidgets
 - jupyterlab
 - pip
-# - mamba
+- mamba
+- pyyaml
 - numpy>=1.22
 - matplotlib
 - pandas>=2.0
