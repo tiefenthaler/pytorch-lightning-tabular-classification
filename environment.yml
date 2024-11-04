@@ -33,6 +33,7 @@ dependencies:
 - mlflow
 - pycaret>=3.0
 - autogluon
+- pytest
 - pip:
   # pip installation
   - black
