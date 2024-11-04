@@ -12,3 +12,10 @@ catboost_info/
 # Pytorch Lightning
 notebooks/lightning_logs/
 notebooks/logs
+
+# Optuna
+notebooks/optuna_storage/
+
+# Pytest
+.pytest_cache
+tests/.pytest_cache
