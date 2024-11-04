@@ -1,28 +1,29 @@
-from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
-import warnings
-
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.preprocessing import OrdinalEncoder
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.pipeline import Pipeline
-import torch
+from sklearn.preprocessing import OrdinalEncoder
+
 
 # Custom transformer to use attributes from the OrdinalEncoder
 class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneFeatureMixin):
+    """OrdinalEncoder Extenstion that handles unknown values given as "-1" and converts them to "0".
+    Shifting the other values by 1 to avoid conflicts with the original values.
+    Supports numpy arrays pandas Series and pandas DataFrames as input and output.
+    """
 
     def _transform_unknown_values(self, X):
         """Generalized function to transform encoded values."""
         return np.where(X == -1, 0, X + 1)
-    
+
     def _inverse_transform_unknown_values(self, X):
         """Generalized function to inverse transform values."""
         return np.where(X == 0, -1, X - 1)
-    
+
     def fit(self, X, y=None):
         # Fit the OrdinalEncoderExtension
         return self
-    
+
     def transform(self, X):
         # Handle different input types
         if isinstance(X, np.ndarray):
@@ -54,10 +55,9 @@ class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneF
             X_inverse = X_inverse.apply(self._inverse_transform_unknown_values)
 
         return X_inverse
-    
+
     def get_feature_names_out(self, *args, **params):
         return self.columns_
-
 
 
 # Example usage

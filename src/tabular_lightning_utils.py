@@ -1,14 +1,14 @@
-from typing import Dict, Iterable, List, Optional, Tuple, Union, Literal
+from typing import Dict, Iterable, List, Literal, Optional, Tuple, Union
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
 import torch
 from torch import nn
 
+from .tabular_lightning import (MulticlassTabularLightningModule,
+                                TabularDataModuleClassificationPACKAGING)
 
-from .tabular_lightning import TabularDataModuleClassificationPACKAGING, MulticlassTabularLightningModule
 
 def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None):
     tabular_data_full = pd.concat([
@@ -22,12 +22,15 @@ def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None):
     assert dm.data.shape == tabular_data_full.shape
 
 
-def check_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None, out: Dict[str, torch.Tensor] = None):
+def check_dataloader_output(
+    dm: TabularDataModuleClassificationPACKAGING = None,
+    out: Dict[str, torch.Tensor] = None,
+):
     """Tests the output of the dataloader."""
 
-    continuous_x = out['continuous']
-    categorical_x = out['categorical']
-    y = out['target']
+    continuous_x = out["continuous"]
+    categorical_x = out["categorical"]
+    y = out["target"]
 
     assert isinstance(y, torch.Tensor), "y output should be a torch.Tensor"
 
@@ -61,9 +64,13 @@ def print_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None)
                 break
             for k, v in dict.items():
                 print(k, v.shape)
-            
+
             network_input = torch.cat((dict["continuous"], dict["categorical"]), dim=1)
-            print("Shape of network input:", network_input.shape, "Data Types Cont:", [column.dtype for column in dict["continuous"].unbind(1)], "Data Types Cat:", [column.dtype for column in dict["categorical"].unbind(1)])
+            print(
+                "Shape of network input:", network_input.shape,
+                "Data Types Cont:", [column.dtype for column in dict["continuous"].unbind(1)],
+                "Data Types Cat:", [column.dtype for column in dict["categorical"].unbind(1)],
+            )
             # print("Shape of target flatten:", dict['target'].flatten().shape, "Data Types:", dict['target'].flatten().dtype)
             print("Shape of target flatten:", dict['target'].shape, "Data Types:", dict['target'].dtype)
             print("Target from current batch:", dict['target'][:5])
@@ -86,7 +93,7 @@ def get_embedding_size(n: int, max_size: int = 100) -> int:
         return min(round(1.6 * n**0.56), max_size)
     else:
         return 1
-    
+
 
 def get_cat_feature_embedding_sizes(data: pd.DataFrame = None, categorical_cols = None) -> None:
     embedding_sizes_cat_features = {
@@ -94,8 +101,10 @@ def get_cat_feature_embedding_sizes(data: pd.DataFrame = None, categorical_cols 
         for cat_feature in data.columns if cat_feature in categorical_cols
     }
     # add 1 to the embedding size to account for the padding token, input tensor must be within the expected range [0, num_embeddings-1]
-    embedding_sizes_cat_features = {key: (first + 1, second) for key, (first, second) in embedding_sizes_cat_features.items()}
-    
+    embedding_sizes_cat_features = {
+        key: (first + 1, second) for key, (first, second) in embedding_sizes_cat_features.items()
+    }
+
     return embedding_sizes_cat_features
 
 
@@ -104,7 +113,7 @@ def print_embbeding_input_output(dm: TabularDataModuleClassificationPACKAGING = 
     Args:
         dm: pre-processed datamodule from class TabularDataModuleClassificationPACKAGING
     """
-    
+
     num_epochs = 1
     for epoch in range(num_epochs):
 
@@ -114,15 +123,22 @@ def print_embbeding_input_output(dm: TabularDataModuleClassificationPACKAGING = 
                 break
             for k, v in dict.items():
                 print(k, v.shape)
-            
+
             network_input = torch.cat((dict["continuous"], dict["categorical"]), dim=1)
-            print("Shape of network input:", network_input.shape, "Data Types Cont:", [column.dtype for column in dict["continuous"].unbind(1)], "Data Types Cat:", [column.dtype for column in dict["categorical"].unbind(1)])
+            print(
+                "Shape of network input:", network_input.shape,
+                "Data Types Cont:", [column.dtype for column in dict["continuous"].unbind(1)],
+                "Data Types Cat:", [column.dtype for column in dict["categorical"].unbind(1)]
+            )
             print("Shape of target flatten:", dict['target'].shape, "Data Types:", dict['target'].dtype)
             print("Dataloader output from current batch, Cont:\n", dict["continuous"][:3])
             print("Dataloader output from current batch, Cat:\n", dict["categorical"][:3])
             # print("Dataloader output from current batch, Cat Feature 0:\n", dict["categorical"][:,0])
 
-            tabular_data_full = pd.concat([dm.train_dataset.get_dataframe, dm.val_dataset.get_dataframe, dm.test_dataset.get_dataframe], axis=0, ignore_index=True)
+            tabular_data_full = pd.concat(
+                [dm.train_dataset.get_dataframe, dm.val_dataset.get_dataframe, dm.test_dataset.get_dataframe],
+                axis=0, ignore_index=True
+            )
             embedding_sizes_cat_features = get_cat_feature_embedding_sizes(tabular_data_full, categorical_cols=dm.categorical_cols)
             embedding_sizes=embedding_sizes_cat_features
             cat_embeddings = nn.ModuleDict()
@@ -138,7 +154,7 @@ def print_embbeding_input_output(dm: TabularDataModuleClassificationPACKAGING = 
             embed_vector_cat = torch.cat(list(output_vectors.values()), dim=1)
             print("Shape Embeddings from current batch, Cat:", embed_vector_cat.shape)
             print("Embeddings from current batch, Cat:\n", embed_vector_cat[0])
-    
+
 
 def print_model_summary(model):
     """Prints a summary of a PyTorch model."""

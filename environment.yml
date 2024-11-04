@@ -38,3 +38,4 @@ dependencies:
   # pip installation
   - black
   - 'black[jupyter]'
+  - isort

@@ -1,17 +1,18 @@
 # import traceback
 
-from typing import Dict, Optional, List, Union, Tuple
-import numpy as np
-from numpy import ndarray
-import pandas as pd
+from typing import Dict, List, Optional, Tuple, Union
+
 import matplotlib.pyplot as plt
-from sklearn.model_selection import StratifiedKFold
+import numpy as np
+import pandas as pd
 import sklearn
 import sklearn.pipeline
+from numpy import ndarray
 from sklearn.base import BaseEstimator
 # from sklearn.metrics import mean_squared_error
-from sklearn.metrics import classification_report
-from sklearn.metrics import fbeta_score
+from sklearn.metrics import classification_report, fbeta_score
+from sklearn.model_selection import StratifiedKFold
+
 
 def f1_score_macro(
     y_true,
