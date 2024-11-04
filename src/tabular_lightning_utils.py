@@ -1,6 +1,13 @@
 from typing import Dict, Iterable, List, Optional, Tuple, Union, Literal
 
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
+import torch
+from torch import nn
+
+
 from .tabular_lightning import TabularDataModuleClassificationPACKAGING, MulticlassTabularLightningModule
 
 def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None):
@@ -16,11 +23,8 @@ def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None):
 
 
 def check_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None, out: Dict[str, torch.Tensor] = None):
-    """
-    Args:
-        dm: pre-processed datamodule from class TabularDataModuleClassificationPACKAGING
-        out: output from the dataloader
-    """
+    """Tests the output of the dataloader."""
+
     continuous_x = out['continuous']
     categorical_x = out['categorical']
     y = out['target']
@@ -47,10 +51,7 @@ def check_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None,
 
 
 def print_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None):
-    """
-    Args:
-        dm: pre-processed datamodule from class TabularDataModuleClassificationPACKAGING
-    """
+    """Prints the output of the dataloader."""
     num_epochs = 1
     for epoch in range(num_epochs):
 
