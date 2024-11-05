@@ -14,6 +14,7 @@ from sklearn.preprocessing import (LabelEncoder, MinMaxScaler, OneHotEncoder,
                                    OrdinalEncoder, StandardScaler)
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
+from torchmetrics import Metric
 from torchmetrics.classification import MulticlassF1Score
 
 from . import encoders
@@ -160,7 +161,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             SEED (Optional[int], optional): The seed for reproducibility. Defaults to 42.
         """
         super().__init__()
-        self.save_hyperparameters()
+        # self.save_hyperparameters()
         self.data_dir = data_dir
         self.categorical_cols = categorical_cols if categorical_cols else []
         self.continuous_cols = continuous_cols if continuous_cols else []
@@ -491,15 +492,11 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
 class MulticlassTabularLightningModule(L.LightningModule):
     def __init__(
         self,
-        n_classes: int = None,
         model: torch.nn.Module = None,
         learning_rate: float = 0.001,
-        train_acc: MulticlassF1Score = None,
-        val_acc: MulticlassF1Score = None,
-        test_acc: MulticlassF1Score = None,
-        # train_acc = MulticlassF1Score(num_classes=n_classes, average='weighted'),
-        # val_acc = MulticlassF1Score(num_classes=n_classes, average='weighted'),
-        # test_acc = MulticlassF1Score(num_classes=n_classes, average='weighted'),
+        train_acc: Metric = None,
+        val_acc: Metric = None,
+        test_acc: Metric = None,
     ) -> None:
         """LightningModule for multiclass classification.
         Args:
@@ -508,13 +505,12 @@ class MulticlassTabularLightningModule(L.LightningModule):
             learning_rate (float): Learning rate.
         """
         super().__init__()
-        self.save_hyperparameters()
-        self.n_classes = n_classes
+        # self.save_hyperparameters()
         self.model = model
         self.learning_rate = learning_rate
-        self.train_acc = train_acc # MulticlassF1Score(num_classes=self.n_classes, average='weighted')
-        self.val_acc = val_acc # MulticlassF1Score(num_classes=self.n_classes, average='weighted')
-        self.test_acc = test_acc # MulticlassF1Score(num_classes=self.n_classes, average='weighted')
+        self.train_acc = train_acc
+        self.val_acc = val_acc
+        self.test_acc = test_acc
 
     def forward(self, x: Dict[str, torch.Tensor]) -> torch.Tensor:
         """Forward pass through the MLP."""
