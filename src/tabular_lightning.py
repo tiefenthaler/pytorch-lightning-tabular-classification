@@ -27,7 +27,7 @@ class TabularDataset(Dataset):
         categorical_cols: Optional[List[str]] = None,
         target: Optional[List[Union[str, int, float]]] = None,
         task: Literal["classification", "regression"] = "classification",
-    ):
+    ) -> None:
         """
         This class is customized for tabular related data for the use of classification and regression. Returns the tabular data as tensor format.
         Input data must be of numeric nature and should be ordinal or label encoded. This should be covered by a related LightningDataModule.
@@ -75,7 +75,7 @@ class TabularDataset(Dataset):
             # self.categorical_X = self.categorical_X.astype(np.int64) # TODO: remove
 
     @property
-    def get_dataframe(self):
+    def get_dataframe(self) -> pd.DataFrame:
         """Creates and returns the dataset as a pandas dataframe."""
         if self.continuous_cols or self.categorical_cols:
             df = pd.DataFrame(
@@ -88,7 +88,7 @@ class TabularDataset(Dataset):
 
         return df
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Returns the total number of samples in the dataset."""
         return self.n_samples
 
@@ -125,9 +125,11 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         batch_size: int = 64,
         batch_size_inference: Optional[int] = None,
         num_workers_train: int = 0,
-        num_workers_inference: int = 0,
+        num_workers_predict: int = 0,
+        kwargs_dataloader_trainvaltest: Dict = {},
+        kwargs_dataloader_predict: Dict = {},
         SEED: Optional[int] = 42,
-    ):
+    ) -> None:
         """
         The class processes the data accordingly, so that the output meets the requirments to be further use of PyTorch/Lightning.
         A shareble, reusable class that encapsulates data loading and data preprocessing logic for classification.
@@ -151,8 +153,11 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             val_size (Optional[float], optional): The size of the validation set. Defaults to None.
             batch_size (int, optional): The batch size for training. Defaults to 64.
             batch_size_inference (Optional[int], optional): The batch size for inference. Defaults to None.
-            num_workers_train (int, optional): The number of workers for training. Defaults to 0.
-            num_workers_inference (int, optional):
+            num_workers_train (int, optional): The number of workers for training. Defaults to 0, which is the main thread (always recoommended).
+            num_workers_predict (int, optional): The number of workers for inference. Defaults to 0, which is the main thread (always recoommended).
+            kwargs_dataloader_trainvaltest (Dict, optional): Additional keyword arguments for the dataloader for training, validation, and testing. Defaults to {}.
+            kwargs_dataloader_predict (Dict, optional): Additional keyword arguments for the dataloader for prediction. Defaults to {}.
+            SEED (Optional[int], optional): The seed for reproducibility. Defaults to 42.
         """
         super().__init__()
         self.data_dir = data_dir
@@ -167,7 +172,9 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         self.batch_size = batch_size
         self.batch_size_inference = self.batch_size if not batch_size_inference else batch_size_inference
         self.num_workers_train = num_workers_train
-        self.num_workers_inference = num_workers_inference
+        self.num_workers_predict = num_workers_predict
+        self.kwargs_dataloader_trainvaltest = kwargs_dataloader_trainvaltest
+        self.kwargs_dataloader_predict = kwargs_dataloader_predict
         self.stage_setup = None
         self.SEED = SEED
 
@@ -255,7 +262,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
 
         return pd.concat([X_transformed, y_transformed], axis=1)
 
-    def prepare_data(self, shuffle: bool = False):
+    def prepare_data(self, shuffle: bool = False) -> None:
         """Custom data specific operations and basic tabular specific operations that only should be performed once on the data (and should not be performed on a distributed manner).
         Load the data as Tabular Data as a Pandas DataFrame from a .csv file and performs custom data processing related to loading a .csv file (data type correction) and defining a subset of features.
         In addition "_prepare_data" performace general data preparation for the classification/regression task and perform basic data error handeling. General data preparation involves:
@@ -424,7 +431,14 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         Returns:
             DataLoader: Train dataloader
         """
-        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=True, num_workers=self.num_workers_train)
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            shuffle=True,
+            drop_last=True,
+            num_workers=self.num_workers_train,
+            **self.kwargs_dataloader_trainvaltest,
+        )
 
     def val_dataloader(self) -> DataLoader:
         """Dataloader that the Trainer fit() and validate() methods uses.
@@ -433,7 +447,13 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         Returns:
             DataLoader: Validation dataloader
         """
-        return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers_train)
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers_train,
+            **self.kwargs_dataloader_trainvaltest,
+        )
 
     def test_dataloader(self) -> DataLoader:
         """Dataloader that the Trainer test() method uses.
@@ -442,7 +462,13 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         Returns:
             DataLoader: Test dataloader
         """
-        return DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers_train)
+        return DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers_train,
+            **self.kwargs_dataloader_trainvaltest,
+        )
 
     def predict_dataloader(self) -> DataLoader:
         """Dataloader that the Trainer predict() method uses.
@@ -453,7 +479,13 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             DataLoader: Test dataloader
         """
         if self.stage_setup == 'predict':
-            return DataLoader(self.predict_dataset, batch_size=self.batch_size_inference, shuffle=False, num_workers=self.num_workers_inference)
+            return DataLoader(
+                self.predict_dataset,
+                batch_size=self.batch_size_inference,
+                shuffle=False,
+                num_workers=self.num_workers_predict,
+                **self.kwargs_dataloader_predict,
+            )
         else:
             return None
 
@@ -464,7 +496,7 @@ class MulticlassTabularLightningModule(L.LightningModule):
         n_classes: int = None,
         model: torch.nn.Module = None,
         learning_rate: float = 0.001,
-    ):
+    ) -> None:
         """LightningModule for multiclass classification.
         Args:
             n_classes (int): Number of classes.
@@ -483,7 +515,7 @@ class MulticlassTabularLightningModule(L.LightningModule):
         """Forward pass through the MLP."""
         return self.model(x)
 
-    def _shared_step(self, batch: Dict[str, torch.Tensor], batch_idx):
+    def _shared_step(self, batch: Dict[str, torch.Tensor], batch_idx) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         x = {key: batch[key] for key in ["continuous", "categorical"]}
         y = batch["target"].flatten()  # flatten to match input shape of F.cross_entropy
         y_hat = self.forward(x)
@@ -491,27 +523,27 @@ class MulticlassTabularLightningModule(L.LightningModule):
         y_hat = torch.argmax(y_hat, dim=1) # provides the class with the highest probability to match the shape of y
         return (loss, y_hat, y)
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch, batch_idx) -> torch.Tensor:
         loss, y_hat, y = self._shared_step(batch, batch_idx)
         self.log(f"train_loss", loss)
         self.train_acc(y_hat, y)
         self.log("train_F1_macro_weighted", self.train_acc, prog_bar=True, on_epoch=True, on_step=False)
         return loss
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx) -> None:
         loss, y_hat, y = self._shared_step(batch, batch_idx)
         self.log("val_loss", loss, prog_bar=True)
         self.val_acc(y_hat, y)
         self.log("val_F1_macro_weighted", self.val_acc, prog_bar=True)
         return
 
-    def test_step(self, batch, batch_idx):
+    def test_step(self, batch, batch_idx) -> None:
         _, y_hat, y = self._shared_step(batch, batch_idx)
         self.test_acc(y_hat, y)
         self.log("test_F1_macro_weighted", self.test_acc)
         return
 
-    def predict_step(self, batch, batch_idx):
+    def predict_step(self, batch, batch_idx) -> torch.Tensor:
         x = {key: batch[key] for key in ["continuous", "categorical"]}
         y_hat = self.forward(x)
         preds = torch.argmax(y_hat, dim=1)
@@ -531,7 +563,7 @@ class MulticlassTabularMLP(torch.nn.Module):
         activation_class: torch.nn.functional = nn.ReLU,
         dropout: float = None,
         norm: bool = True,
-    ):
+    ) -> None:
         """Multi Layer Perceptron (MLP) for multiclass classification for tabular data.
         Args:
             input_size (int): Number of input features.
@@ -590,7 +622,7 @@ class MulticlassTabularCatEmbeddingMLP(torch.nn.Module):
         dropout: float = None,
         norm: bool = True,
         embedding_sizes: Dict[str, Tuple[int, int]] = None,
-    ):
+    ) -> None:
         """Embedding Multi Layer Perceptron (embMLP) with embedding for categorical features for multiclass classification for tabular data.
         Args:
             continues_cols (List[str]): order of continuous variables in tensor passed to forward function.
