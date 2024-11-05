@@ -9,7 +9,7 @@ channels:
 
 dependencies:
 # conda installation
-- python>=3.10,<3.12
+- python>=3.11
 - ipython_genutils
 - ipykernel
 - ipywidgets
@@ -29,6 +29,7 @@ dependencies:
 - pytorch
 - lightning
 - optuna
+- optuna.integration
 - imbalanced-learn
 - mlflow
 - pycaret>=3.0
