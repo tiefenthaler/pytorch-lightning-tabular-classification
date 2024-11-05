@@ -160,6 +160,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             SEED (Optional[int], optional): The seed for reproducibility. Defaults to 42.
         """
         super().__init__()
+        self.save_hyperparameters()
         self.data_dir = data_dir
         self.categorical_cols = categorical_cols if categorical_cols else []
         self.continuous_cols = continuous_cols if continuous_cols else []
@@ -367,7 +368,6 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         else:
             raise ValueError(f"Stage must be 'fit', 'validate', 'test' or 'predict', got {stage}")
 
-
         # pre-process data
         if stage in ("fit", "validate", "test"):
             # the logic ensures that y_train is during all training scenarios and inference scenario always the right reference for number of classes.
@@ -383,7 +383,6 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             )
         elif stage == 'predict':
             tabular_predict = self._preprocessing_pipeline(X_pred, y_pred, stage='inference')
-
 
         # create datasets
         # NOTE: instanziation of datasets (train, val test) in stage == ('fit', 'validate', 'test') is controlled by self.test_size and self.val_size
@@ -422,7 +421,6 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             )
         else:
             raise ValueError(f"Stage must be 'fit', 'validate', 'test' or 'predict', got {stage}")
-
 
     def train_dataloader(self) -> DataLoader:
         """Dataloader that the Trainer fit() method uses.
@@ -496,6 +494,12 @@ class MulticlassTabularLightningModule(L.LightningModule):
         n_classes: int = None,
         model: torch.nn.Module = None,
         learning_rate: float = 0.001,
+        train_acc: MulticlassF1Score = None,
+        val_acc: MulticlassF1Score = None,
+        test_acc: MulticlassF1Score = None,
+        # train_acc = MulticlassF1Score(num_classes=n_classes, average='weighted'),
+        # val_acc = MulticlassF1Score(num_classes=n_classes, average='weighted'),
+        # test_acc = MulticlassF1Score(num_classes=n_classes, average='weighted'),
     ) -> None:
         """LightningModule for multiclass classification.
         Args:
@@ -504,12 +508,13 @@ class MulticlassTabularLightningModule(L.LightningModule):
             learning_rate (float): Learning rate.
         """
         super().__init__()
+        self.save_hyperparameters()
         self.n_classes = n_classes
         self.model = model
         self.learning_rate = learning_rate
-        self.train_acc = MulticlassF1Score(num_classes=self.n_classes, average='weighted')
-        self.val_acc = MulticlassF1Score(num_classes=self.n_classes, average='weighted')
-        self.test_acc = MulticlassF1Score(num_classes=self.n_classes, average='weighted')
+        self.train_acc = train_acc # MulticlassF1Score(num_classes=self.n_classes, average='weighted')
+        self.val_acc = val_acc # MulticlassF1Score(num_classes=self.n_classes, average='weighted')
+        self.test_acc = test_acc # MulticlassF1Score(num_classes=self.n_classes, average='weighted')
 
     def forward(self, x: Dict[str, torch.Tensor]) -> torch.Tensor:
         """Forward pass through the MLP."""
