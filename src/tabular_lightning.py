@@ -15,7 +15,6 @@ from sklearn.preprocessing import (LabelEncoder, MinMaxScaler, OneHotEncoder,
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from torchmetrics import Metric
-from torchmetrics.classification import MulticlassF1Score
 
 from . import encoders
 
@@ -492,7 +491,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
 class MulticlassTabularLightningModule(L.LightningModule):
     def __init__(
         self,
-        model: torch.nn.Module = None,
+        model: nn.Module = None,
         learning_rate: float = 0.001,
         train_acc: Metric = None,
         val_acc: Metric = None,
@@ -501,8 +500,11 @@ class MulticlassTabularLightningModule(L.LightningModule):
         """LightningModule for multiclass classification.
         Args:
             n_classes (int): Number of classes.
-            model (torch.nn.Module): Model to be trained.
+            model (nn.Module): Model to be trained.
             learning_rate (float): Learning rate.
+            train_acc (Metric): Metric for training loss/accuracy.
+            val_acc (Metric): Metric for validation loss/accuracy.
+            test_acc (Metric): Metric for test loss/accuracy.
         """
         super().__init__()
         # self.save_hyperparameters()
@@ -516,7 +518,7 @@ class MulticlassTabularLightningModule(L.LightningModule):
         """Forward pass through the MLP."""
         return self.model(x)
 
-    def _shared_step(self, batch: Dict[str, torch.Tensor], batch_idx) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def _shared_step(self, batch: Dict[str, torch.Tensor], batch_idx) -> Tuple[torch.Tensor]:
         x = {key: batch[key] for key in ["continuous", "categorical"]}
         y = batch["target"].flatten()  # flatten to match input shape of F.cross_entropy
         y_hat = self.forward(x)
@@ -550,18 +552,18 @@ class MulticlassTabularLightningModule(L.LightningModule):
         preds = torch.argmax(y_hat, dim=1)
         return preds
 
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> torch.optim.Adam:
         return torch.optim.Adam(params=self.parameters(), lr=self.learning_rate)
 
 
-class MulticlassTabularMLP(torch.nn.Module):
+class MulticlassTabularMLP(nn.Module):
     def __init__(
         self,
         input_size: int = None,
         output_size: int = None,
         hidden_size: int = None,
         n_hidden_layers: int = None,
-        activation_class: torch.nn.functional = nn.ReLU,
+        activation_class: nn.Module = nn.ReLU,
         dropout: float = None,
         norm: bool = True,
     ) -> None:
@@ -571,7 +573,7 @@ class MulticlassTabularMLP(torch.nn.Module):
             output_size (int): Number of output classes.
             hidden_size (int): Number of neurons in hidden layers.
             n_hidden_layers (int): Number of hidden layers.
-            activation_class (torch.nn.functional): Activation function.
+            activation_class (nn.Module): Activation function.
             dropout (float): Dropout rate.
             norm (bool): Whether to use layer normalization.
         """
@@ -610,7 +612,7 @@ class MulticlassTabularMLP(torch.nn.Module):
         return self.sequential(network_input)
 
 
-class MulticlassTabularCatEmbeddingMLP(torch.nn.Module):
+class MulticlassTabularCatEmbeddingMLP(nn.Module):
     def __init__(
         self,
         continuous_cols: List[str] = None,
@@ -619,7 +621,7 @@ class MulticlassTabularCatEmbeddingMLP(torch.nn.Module):
         # embedding_dim: int = None,
         hidden_size: int = None,
         n_hidden_layers: int = None,
-        activation_class: torch.nn.functional = nn.ReLU,
+        activation_class: nn.Module = nn.ReLU,
         dropout: float = None,
         norm: bool = True,
         embedding_sizes: Dict[str, Tuple[int, int]] = None,
@@ -631,7 +633,7 @@ class MulticlassTabularCatEmbeddingMLP(torch.nn.Module):
             output_size (int): Number of output classes.
             hidden_size (int): Number of neurons in hidden layers.
             n_hidden_layers (int): Number of hidden layers.
-            activation_class (torch.nn.functional): Activation function.
+            activation_class (nn.Module): Activation function.
             dropout (float): Dropout rate.
             norm (bool): Whether to use layer normalization.
             embedding_sizes (Dict[str, Tuple[int, int]]): Dictionary of embedding sizes for each categorical feature.

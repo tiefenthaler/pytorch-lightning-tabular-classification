@@ -1,7 +1,6 @@
 from typing import Dict, Iterable, List, Literal, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import torch
 from torch import nn
@@ -10,7 +9,11 @@ from .tabular_lightning import (MulticlassTabularLightningModule,
                                 TabularDataModuleClassificationPACKAGING)
 
 
-def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None):
+def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None) -> None:
+    """Tests the consistency of the data.
+    Args:
+        dm: pre-processed datamodule from class TabularDataModuleClassificationPACKAGING
+    """
     tabular_data_full = pd.concat([
         dm.train_dataset.get_dataframe,
         dm.val_dataset.get_dataframe,
@@ -25,8 +28,12 @@ def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None):
 def check_dataloader_output(
     dm: TabularDataModuleClassificationPACKAGING = None,
     out: Dict[str, torch.Tensor] = None,
-):
-    """Tests the output of the dataloader."""
+) -> None:
+    """Tests the output of the dataloader.
+    Args:
+        dm: pre-processed datamodule from class TabularDataModuleClassificationPACKAGING
+        out: output of the dataloader
+    """
 
     continuous_x = out["continuous"]
     categorical_x = out["categorical"]
@@ -53,8 +60,11 @@ def check_dataloader_output(
     assert categorical_x.size(1) == dm.data[dm.categorical_cols].shape[1]
 
 
-def print_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None):
-    """Prints the output of the dataloader."""
+def print_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None) -> None:
+    """Prints the output of the dataloader.
+    Args:
+        dm: pre-processed datamodule from class TabularDataModuleClassificationPACKAGING
+    """
     num_epochs = 1
     for epoch in range(num_epochs):
 
@@ -79,13 +89,10 @@ def print_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None)
 
 
 def get_embedding_size(n: int, max_size: int = 100) -> int:
-    """
-    Determine empirically good embedding sizes (formula taken from fastai).
-
+    """Determine empirically good embedding sizes (formula taken from fastai).
     Args:
         n (int): number of classes
         max_size (int, optional): maximum embedding size. Defaults to 100.
-
     Returns:
         int: embedding size
     """
@@ -96,6 +103,15 @@ def get_embedding_size(n: int, max_size: int = 100) -> int:
 
 
 def get_cat_feature_embedding_sizes(data: pd.DataFrame = None, categorical_cols = None) -> None:
+    """Calculates the embedding size for each categorical feature.
+    Additionally, adds 1 to the embedding size to account for the padding token,
+    input tensor must be within the expected range [0, num_embeddings-1].
+    Args:
+        data (pd.DataFrame): data
+        categorical_cols (list): list of categorical columns
+    Returns:
+        dict: dictionary of embedding sizes for each categorical feature
+    """
     embedding_sizes_cat_features = {
         cat_feature: (data[cat_feature].nunique(), get_embedding_size(data[cat_feature].nunique()))
         for cat_feature in data.columns if cat_feature in categorical_cols
@@ -108,12 +124,12 @@ def get_cat_feature_embedding_sizes(data: pd.DataFrame = None, categorical_cols 
     return embedding_sizes_cat_features
 
 
-def print_embbeding_input_output(dm: TabularDataModuleClassificationPACKAGING = None):
-    """
+def print_embbeding_input_output(dm: TabularDataModuleClassificationPACKAGING = None) -> None:
+    """Prints the output of the dataloader, including the embedding layer.
+    Called to verify the embedding layer.
     Args:
         dm: pre-processed datamodule from class TabularDataModuleClassificationPACKAGING
     """
-
     num_epochs = 1
     for epoch in range(num_epochs):
 
@@ -124,9 +140,7 @@ def print_embbeding_input_output(dm: TabularDataModuleClassificationPACKAGING = 
             for k, v in dict.items():
                 print(k, v.shape)
 
-            network_input = torch.cat((dict["continuous"], dict["categorical"]), dim=1)
             print(
-                "Shape of network input:", network_input.shape,
                 "Data Types Cont:", [column.dtype for column in dict["continuous"].unbind(1)],
                 "Data Types Cat:", [column.dtype for column in dict["categorical"].unbind(1)]
             )
@@ -156,7 +170,7 @@ def print_embbeding_input_output(dm: TabularDataModuleClassificationPACKAGING = 
             print("Embeddings from current batch, Cat:\n", embed_vector_cat[0])
 
 
-def print_model_summary(model):
+def print_model_summary(model) -> None:
     """Prints a summary of a PyTorch model."""
     # Accessing individual parameters
     for name, param in model.named_parameters():
@@ -167,7 +181,7 @@ def print_model_summary(model):
     return
 
 
-def plot_training_metrics(metrics: pd.DataFrame, **kwargs):
+def plot_training_metrics(metrics: pd.DataFrame, **kwargs) -> pd.DataFrame:
     """
     Plot metrics from a dataframe.
     Args:
