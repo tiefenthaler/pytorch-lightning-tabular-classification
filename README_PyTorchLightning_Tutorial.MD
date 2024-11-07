@@ -79,7 +79,7 @@ Here's a breakdown of each:
 To reach sustainability goals for the packaging of products, the company needs to know to which packaging categories the single items belong to. Since this information is not given for 45.058 items of the total 137.035 items, the goal is to provide the categories for the items with missing ones based on a data-driven approach. The solution should be applied for compareable data sets from multiple origins. First analysis has shown that simple 1:1 relationships and rule-based approaches do not lead to proper results. Therefore, a machine learning approach was used. The goal is to build a solution that is capable of doing a highly accurate prediction for as many packaging categories as possible.  
 For more information about the use case look at the [README.MD](https://github.com/tiefenthaler/ml_packaging_classification/blob/main/README.md).
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/ec0a04a4-8d22-40c0-87ac-3f95e6fd2543/fa9bfd15-b6e0-42bf-9638-7bd73234543c.png)
+![Dataset Overview](docs/README_PyTorchLightning_Tutorial/dataset_overview_2.png)
 
 # Building our Deep Learning Pipeline
 
@@ -635,7 +635,7 @@ dm.setup(stage='fit')
 dm.train_dataset.get_dataframe.head(5)
 ```
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/f53634ee-82e0-4ac4-b72d-83c946b04edb/image.png)
+![Processed Dataset](docs/README_PyTorchLightning_Tutorial/dataset_processed.png)
 
 ## LightningModule & LightningTrainer for Tabular Data
 
@@ -783,7 +783,8 @@ class MulticlassTabularMLP(nn.Module):
 
 ### MLP with Categorical Feature Embeddings Model Definition (Code Implementation)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/4fbec1a1-8c60-4a44-ae99-188db849f0ac/image.png)
+![Model Architecture - Embedding MLP](docs/README_PyTorchLightning_Tutorial/embMLP_architecture.png)
+*Image Source: [[Link to Source](https://towardsdatascience.com/deep-learning-for-tabular-data-using-pytorch-1807f2858320)]*
 
 The `MulticlassTabularCatEmbeddingMLP` is an advanced multi-layer perceptron (MLP) model tailored for multiclass classification tasks on tabular data, with a specific focus on handling both continuous and categorical features through embedding layers. The model integrates embeddings for categorical variables to efficiently represent high-cardinality features and combines them with continuous features using normalization techniques.
 
@@ -895,7 +896,7 @@ embedding_sizes_cat_features = tl_utils.get_cat_feature_embedding_sizes(tabular_
 embedding_sizes_cat_features
 ```
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/3538f0a5-c5c9-4dff-bc86-f2a74ac3b251/image.png)
+![Embedding Sizes](docs/README_PyTorchLightning_Tutorial/embedding_sizes.png)
 
 ### Instantiation of MLP Model and MulticlassTabularLightningModule (Code Implementation)
 
@@ -925,9 +926,9 @@ multiclass_embMLP = MulticlassTabularCatEmbeddingMLP(
 )
 ```
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/a1298783-7b6a-4a90-9c55-9b581391d24f/image.png)
-
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/48e48428-d18d-4720-ae51-2d3af24a018e/image.png)
+| MLP Model Parameters | embMLP Model Parameters |
+|---|---|
+| <img src="docs/README_PyTorchLightning_Tutorial/MLP_parameters.png" alt="MLP Model Parameters" width="50%"> | <img src="docs/README_PyTorchLightning_Tutorial/embMLP_parameters.png" alt="embMLP Model Parameters" width="50%"> |
 
 ```python
 lightningmodel = MulticlassTabularLightningModule(
@@ -984,6 +985,9 @@ plot_training_metrics(metrics)
 # test performance on test data
 trainer.test(model=lightningmodel, dataloaders=dm.test_dataloader())
 ```
+![MLP Metrics Traing and Validation](docs/README_PyTorchLightning_Tutorial/MLP_metrics_train_val.png)
+
+![MLP Validation Performance](docs/README_PyTorchLightning_Tutorial/MLP_val_performance.png)
 
 ```python
 empmlp_experiment_name = "embMLP-v0"
@@ -1020,13 +1024,9 @@ plot_training_metrics(metrics)
 trainer.test(model=lightningmodel, dataloaders=dm.test_dataloader())
 ```
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/2457750e-66b8-4ca5-909c-ebb7e65d53d3/image.png)
+![embMLP Metrics Training and Validation](docs/README_PyTorchLightning_Tutorial/embMLP_metrics_train_val.png)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/4b794e96-c023-494f-be2c-60638063b0c5/image.png)
-
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/6570d69e-3d63-478f-92f6-9c78ae862c50/image.png)
-
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/5dd3ebfd-d286-4254-881a-8f259e2c5c95/image.png)
+![embMLP Validation Performance](docs/README_PyTorchLightning_Tutorial/embMLP_val_performance.png)
 
 ```python
 # make predictions on test data and evaluate
@@ -1038,9 +1038,11 @@ y_test = dm.label_encoder_target.inverse_transform(dm.test_dataset.get_dataframe
 print(classification_report(y_test, preds_y_test))
 ```
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/81f601f3-04ef-4da9-9038-872eefbc4a1f/image.png)
+![MLP Classification Report](docs/README_PyTorchLightning_Tutorial/MLP_classification_report.png)
+*MLP Classification Report*
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/aa46ee85-a693-4ca1-a7ea-78fa45960ee3/af78e7af-a351-4fd9-83b3-0f193b849e1d/image.png)
+![embMLP Classification Report](docs/README_PyTorchLightning_Tutorial/embMLP_classification_report.png)
+*embMLP Classification Report*
 
 # Summary
 
