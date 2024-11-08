@@ -2,6 +2,8 @@ PyTorch Lightning
 =================
 *This blog post provides an extensive tutorial of practical implementation of PyTorch Lightning for a real-world multi-class classification problem focused on product packaging categorization. The showcase walks through building a complete deep learning pipeline for tabular data, from data preparation to model deployment. While the code examples use a specific packaging classification dataset, the implementations are designed to be reusable for any tabular multi-class classification task. The tutorial serves both as a learning resource for PyTorch Lightning fundamentals and as a template for similar business applications.*
 
+Find the full code in the repository [pytorch-lightning-tabular-classification](https://github.com/tiefenthaler/pytorch-lightning-tabular-classification) on GitHub.
+
 # Table of Contents
 **Section 1. and 2. provide a brief overview of PyTorch Lightning.**  
 **Section 3. describes the use case of tabular multi-class classification.**  
@@ -96,7 +98,7 @@ In this tutorial I demonstrate the usage of Datasets, DataLoaders, LightningData
         - `def prepare_data`
         Data Operations that only should be performed once on the data (and should not be performed on a distributed manner). Prepares the data for data pre-processing e.g. using sklearn.
             - Loading the data from .csv to pd.DataFrame
-            - General dataset preperations like feature selection and data type correction
+            - General dataset preparations like feature selection and data type correction
         - `def setup`
         First, data operations (like shuffle, split data, categorical encoding, normalization, etc.), which any dataframe should undergo before feeding into the dataloader will be performed here. Since we use sklearn functionalities for our tabular pre-processing pipeline the data input and output of the pre-processing is a tabular format (dataframe) and not a tensor format.
         Second, the outcome of `def setup` are `Dataset` objects for each split (e.g. train, val, test, pred), which is a wrapper around the pre-processed tabular data and provides the samples and their corresponding labels (ideally in tensor format) in a specific way to be compatible for the model(s).
@@ -1057,3 +1059,7 @@ Several model architectures were introduced for handling tabular data, including
 3. **In summary**, the code automates the training and optimization process of an MLP model, including hyperparameter tuning (learning rate), logging, early stopping, and performance evaluation on test data. It provides a robust framework for managing the entire lifecycle of a simple experiment.
 
 This post equips readers with the knowledge to build and train effective deep learning models on tabular data, leveraging the flexibility of PyTorch Lightning and advanced techniques like embeddings for categorical features. These techniques enable efficient and scalable solutions for real-world multiclass classification tasks.
+
+Related frameworks: [PyTorch Tabular](https://pytorch-tabular.readthedocs.io/en/latest/)
+"PyTorch Tabular is a powerful library that aims to simplify and popularize the application of deep learning techniques to tabular data."
+The library provieds a high-level API for deep learning on tabular data including data preprocessing, model training, and model evaluation. The downside is that the abstraction layer it provides does not allow for fine-grained control over the machine learning workflow.
