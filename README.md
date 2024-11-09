@@ -1,14 +1,26 @@
-# README table of contents
-- [ml_packaging_classification](#ml-packaging-classification)
-- [Use case description:](#use-case-description-)
-- [Structure of the showcase](#structure-of-the-showcase)
+# 1. Overview
 
+Find the full code in the repository [pytorch-lightning-tabular-classification](https://github.com/tiefenthaler/pytorch-lightning-tabular-classification) on GitHub.
 
-# ml_packaging_classification
+## 1.1. Table of Contents
+
+**Section 1 and 2 provide a brief overview of PyTorch Lightning.**  
+**Section 3 describes the use case of tabular multi-class classification.**  
+**Section 4 provides the code implementation of the deep learning pipeline.**
+
+- [1. Overview](#1-overview)
+  - [1.1. Table of Contents](#11-table-of-contents)
+- [2. Packaging Classification a Tabular Data Use Case using Machine Learning](#2-packaging-classification-a-tabular-data-use-case-using-machine-learning)
+- [3. Use case description:](#3-use-case-description)
+- [4. Structure of the showcase](#4-structure-of-the-showcase)
+- [5. Code structure](#5-code-structure)
+
+# 2. Packaging Classification a Tabular Data Use Case using Machine Learning
+
 This repo is meant as a showcase to demonstrate a data science workflow for a multi-class classification (see use case description below) use case in business context. Data science use cases may have very different nature in terms of how the result/solution is used by the business. This use case has the characteristic of providing one-time insights and a inference solution to be reused manually to get the classification outputs further continues usage by the business. Therefore the repo focuses on analytics and limits operational aspects for analytical reusability. Still the repo contains proper data engineering and data science best practices for data preparation, pre-processing, modeling and evaluation. Many different frameworks for modeling with their specific integrations are used. Each of the different frameworks is used to demonstrate the reusability of the code and the data science workflow and contains a **pre-processing pipeline**, **modeling pipeline** and **evaluation pipeline**. A description of each solution for a given framework as given in the related notebook. For the data science pipeline with best performance, the best performing model is used to create a **prediction pipeline** and **deeper analysis** of the model and the related results in respect to performance and the business goal.
 
-
 The repo focuses on the following aspects:
+
 - Build a simple ETL pipeline to prepare the raw data for analysis and classification.
 - Conduct general data analysis for data quality investigation under consideration of the business goal.
 - Conduct data analysis to get an understanding how to handle the data for multi-class classification, including a naive benchmark model using sklearn (DummyClassifier & a custom classifier).
@@ -49,14 +61,33 @@ The repo focuses on the following aspects:
 
 **Python:** [sklearn](https://scikit-learn.org/stable/) | [PyCaret](https://pycaret.gitbook.io/docs) | [AutoGluon.Tabular](https://auto.gluon.ai/stable/tutorials/tabular/index.html) | [LightGBM](https://lightgbm.readthedocs.io/en/stable/) | [PyTorch/Lightning](https://lightning.ai/pytorch-lightning) | [MLflow](https://mlflow.org/) | [Optuna](https://optuna.org/) | [Docker](https://www.docker.com/)
 
-# Use case description:
+# 3. Use case description:
+
 To reach sustainability goals for the packaging of products, the company needs to know to which packaging categories the single items belong to. Since this information is not given for 45.058 items of the total 137.035 items, the goal is to provide the categories for the items with missing ones based on a data-driven approach. The solution should be applied for comparable data sets from multiple origins.
 
 First analysis has shown that simple 1:1 relationships and rule-based approaches do not lead to proper results. Therefore, a machine learning approach was used. The goal is to build a solution that is capable of doing a highly accurate prediction for as many packaging categories as possible. Meaning that on the one side predictions need to meet a certain threshold for accuracy to be useful for the business (a small amount of wrong classifications can be tolerated but low classification accuracy does not help the business). On the other hand, a threshold for a minimum number of products needs to be covered (it is not mandatory to provide good predictions for all items, but providing good predictions for only a small amount of items also does not help the business a lot). Finally the machine learning solution should consider business decision optimization (cost optimization) based on different individual packaging categories (class).
 
-
-# Structure of the showcase
+# 4. Structure of the showcase
 As the showcase is intended to reflect the data science process to tackle the use case, the structure builds up on this.
 
-**Code structure**
-Directory-tree structure:
+# 5. Code structure
+
+```Python
+Directory-tree structure:  
+|-- environment.yml  
+|-- README.md  
+|-- README_ml_packaging_classification.md  
+|-- notebooks  
+|   |-- 20_clf_pipeline_pytorch_embeddingMLP_optuna.ipynb # Embedding MLP with Optuna  
+|   |-- 20_clf_pipeline_pytorch_embeddingMLP.ipynb # Embedding MLP  
+|   |-- 20_clf_pipeline_pytorch_MLP_optuna.ipynb # MLP with Optuna  
+|   |-- 20_clf_pipeline_pytorch_MLP.ipynb # MLP, including deteiled code description  
+|-- src  
+|   |-- pytorch_tabular # Modules for Tabular Data using PyTorch Lightning
+|   |   |-- callbacks.py # callbacks for Lightning Trainer  
+|   |   |-- enciders.py # custom encoders for data preprocessing  
+|   |   |-- tabular_lightning.py # lightning classes for tabular data  
+|   |   |-- tabular_lightning_utils.py # for shared utilitie functions  
+|   |   |-- tabular_models.py # custom models for Pytorch/Lightning  
+|   |-- utils.py # for shared functions  
+```

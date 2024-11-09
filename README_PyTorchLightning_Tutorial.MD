@@ -1,29 +1,37 @@
-PyTorch Lightning
-=================
+# 1. PyTorch Lightning
+
 *This blog post provides an extensive tutorial of practical implementation of PyTorch Lightning for a real-world multi-class classification problem focused on product packaging categorization. The showcase walks through building a complete deep learning pipeline for tabular data, from data preparation to model deployment. While the code examples use a specific packaging classification dataset, the implementations are designed to be reusable for any tabular multi-class classification task. The tutorial serves both as a learning resource for PyTorch Lightning fundamentals and as a template for similar business applications.*
 
 Find the full code in the repository [pytorch-lightning-tabular-classification](https://github.com/tiefenthaler/pytorch-lightning-tabular-classification) on GitHub.
 
-# Table of Contents
-**Section 1. and 2. provide a brief overview of PyTorch Lightning.**  
-**Section 3. describes the use case of tabular multi-class classification.**  
-**Section 4. provides the code implementation of the deep learning pipeline.**  
-1. [PyTorch Lightning Overview](#pytorch-lightning-overview)
-2. [Key Features of PyTorch Lightning](#key-features-of-pytorch-lightning)
-   - [Core API Features - Datasets, DataLoaders, LightningDataModule, LightningModule and LightningTrainer](#datasets-dataloaders-lightningdatamodule-lightningmodule-and-lightningtrainer---core-api-features-version-lightningpytorch--20)
+## 1.1. Table of Contents
 
-3. [Tabular Multi-Class Classification Use Case](#tabular-multi-class-classification-use-case)
+**Section 1 and 2 provide a brief overview of PyTorch Lightning.**  
+**Section 3 describes the use case of tabular multi-class classification.**  
+**Section 4 provides the code implementation of the deep learning pipeline.**  
 
-4. [Building our Deep Learning Pipeline](#building-our-deep-learning-pipeline)
-   - [Datasets, DataLoaders, LightningDataModule for Tabular Data (Code Implementation)](#datasets-dataloaders-lightningdatamodule-for-tabular-data)
-   - [Multi-Layer-Perceptron (MLP) Model Definition (Code Implementation)](#multi-layer-perceptron-mlp-model-definition)
-   - [MLP with Categorical Feature Embeddings Model Definition (Code Implementation)](#mlp-with-categorical-feature-embeddings-model-definition)
-   - [Instantiation of MLP Model and MulticlassTabularLightningModule (Code Implementation)](#instantiation-of-mlp-model-and-multiclasstabularlightningmodule)
-   - [Training & Evaluation with LightningTrainer (Code Implementation)](#training--evaluation-with-lightningtrainer)
+- [1. PyTorch Lightning](#1-pytorch-lightning)
+  - [1.1. Table of Contents](#11-table-of-contents)
+- [2. PyTorch Lightning Overview](#2-pytorch-lightning-overview)
+- [3. Key Features of PyTorch Lightning](#3-key-features-of-pytorch-lightning)
+  - [3.1. Datasets, DataLoaders, LightningDataModule, LightningModule and LightningTrainer - Core API Features (Version: Lightning.PyTorch \> 2.0)](#31-datasets-dataloaders-lightningdatamodule-lightningmodule-and-lightningtrainer---core-api-features-version-lightningpytorch--20)
+- [4. Tabular Multi-Class Classification Use Case](#4-tabular-multi-class-classification-use-case)
+- [5. Building our Deep Learning Pipeline](#5-building-our-deep-learning-pipeline)
+  - [5.1. Datasets, DataLoaders, LightningDataModule for Tabular Data](#51-datasets-dataloaders-lightningdatamodule-for-tabular-data)
+    - [5.1.1. Dataset for Tabular Data (Code Implementation)](#511-dataset-for-tabular-data-code-implementation)
+    - [5.1.2. LightningDataModule (Code Implementation)](#512-lightningdatamodule-code-implementation)
+    - [5.1.3. Instantiation of TabularDataModuleClassificationPACKAGING with our use case data (Code Implementation)](#513-instantiation-of-tabulardatamoduleclassificationpackaging-with-our-use-case-data-code-implementation)
+  - [5.2. LightningModule \& LightningTrainer for Tabular Data](#52-lightningmodule--lightningtrainer-for-tabular-data)
+    - [5.2.1. LightningModule (Code Implementation)](#521-lightningmodule-code-implementation)
+    - [5.2.2. Multi-Layer-Perceptron (MLP) Model Definition (Code Implementation)](#522-multi-layer-perceptron-mlp-model-definition-code-implementation)
+    - [5.2.3. MLP with Categorical Feature Embeddings Model Definition (Code Implementation)](#523-mlp-with-categorical-feature-embeddings-model-definition-code-implementation)
+    - [5.2.4. Instantiation of MLP Model and MulticlassTabularLightningModule (Code Implementation)](#524-instantiation-of-mlp-model-and-multiclasstabularlightningmodule-code-implementation)
+    - [5.2.5. Training \& Evaluation with LightningTrainer (Code Implementation)](#525-training--evaluation-with-lightningtrainer-code-implementation)
+- [6. Summary](#6-summary)
+- [7. Code structure](#7-code-structure)
 
-5. [Summary](#summary)
+# 2. PyTorch Lightning Overview
 
-# PyTorch Lightning Overview
 **PyTorch Lightning** is a high-level, open-source framework built on top of **PyTorch** that simplifies the process of training and deploying deep learning models. Its primary goal is to provide a clear, organized, and more scalable way to develop machine learning models, without sacrificing the flexibility and power of PyTorch itself.
 
 PyTorch Lightning abstracts away much of the boilerplate code involved in model training, such as managing the training loop, logging, and handling device placement, allowing researchers and developers to focus more on the architecture and experimentation aspects of their models.
@@ -35,7 +43,7 @@ PyTorch Lightning abstracts away much of the boilerplate code involved in model 
 - **For developers new to PyTorch**: Lightning reduces the amount of boilerplate code and makes PyTorch more approachable, especially for those who are not deeply familiar with all of its intricacies.
 - **For teams**: When multiple people need to collaborate on the same codebase or experiment, PyTorch Lightning can help maintain cleaner code and standardize practices.
 
-# Key Features of PyTorch Lightning
+# 3. Key Features of PyTorch Lightning
 
 1. **Cleaner Code Structure**:
     - Lightning abstracts away the common parts of the training loop (e.g., the forward pass, loss computation, optimizer steps, etc.) while still keeping the flexibility to modify any part of the process.
@@ -62,9 +70,9 @@ PyTorch Lightning abstracts away much of the boilerplate code involved in model 
     - Works seamlessly with popular data processing libraries like **PyTorch DataLoader** and integrates easily with datasets.
     - PyTorch Lightning provides the ability to easily extend data loaders and preprocessors as needed.
 10. **Ecosystem Support**:
-- Lightning integrates with other parts of the PyTorch ecosystem, such as **TorchMetrics** for metrics computation, **TorchServe** for model serving, and **PyTorch Lightning Flash** for simplifying common tasks like text classification, image recognition, and more.
+    - Lightning integrates with other parts of the PyTorch ecosystem, such as **TorchMetrics** for metrics computation, **TorchServe** for model serving, and **PyTorch Lightning Flash** for simplifying common tasks like text classification, image recognition, and more.
 
-## **Datasets, DataLoaders, LightningDataModule, LightningModule and LightningTrainer -** Core API Features (Version: Lightning.PyTorch > 2.0)
+## 3.1. Datasets, DataLoaders, LightningDataModule, LightningModule and LightningTrainer - Core API Features (Version: Lightning.PyTorch > 2.0)
 
 In PyTorch Lightning, **Datasets**, **DataLoaders**, and **LightningDataModules** play key roles in efficiently handling and managing data, which is often a central challenge in training deep learning models. These components help organize the data pipeline in a clean, modular, and scalable way, while ensuring that the data is efficiently fed into the model during training, validation, testing and prediction.
 
@@ -76,16 +84,16 @@ Here's a breakdown of each:
 - **LightningModule** (PyTorch Lightning Concept): The `LightningModule` is a core abstraction in PyTorch Lightning that serves as the interface for defining the architecture, training, and evaluation logic of a deep learning model. It allows you to encapsulate all aspects of model development, including the model definition, forward pass, loss computation, optimizer setup, and training/validation loops, in one unified structure. By inheriting from the LightningModule, you get a high-level framework that abstracts away much of the boilerplate code needed for training, validation, and testing, enabling faster experimentation and better model management.
 - **LightningTrainer** (PyTorch Lightning Concept): The `LightningTrainer` class provides a high-level interface for configuring and running the training, validation and prediction loop. It takes care of important aspects such as device management (CPU, GPU, TPU, or distributed training), gradient accumulation and optimizer steps**,** automatic logging and checkpointing, early stopping, and more.
 
-# Tabular Multi-Class Classification Use Case
+# 4. Tabular Multi-Class Classification Use Case
 
 To reach sustainability goals for the packaging of products, the company needs to know to which packaging categories the single items belong to. Since this information is not given for 45.058 items of the total 137.035 items, the goal is to provide the categories for the items with missing ones based on a data-driven approach. The solution should be applied for compareable data sets from multiple origins. First analysis has shown that simple 1:1 relationships and rule-based approaches do not lead to proper results. Therefore, a machine learning approach was used. The goal is to build a solution that is capable of doing a highly accurate prediction for as many packaging categories as possible.  
 For more information about the use case look at the [README.MD](https://github.com/tiefenthaler/ml_packaging_classification/blob/main/README.md).
 
 ![Dataset Overview](docs/README_PyTorchLightning_Tutorial/dataset_overview_2.png)
 
-# Building our Deep Learning Pipeline
+# 5. Building our Deep Learning Pipeline
 
-## **Datasets, DataLoaders, LightningDataModule for Tabular Data**
+## 5.1. Datasets, DataLoaders, LightningDataModule for Tabular Data
 
 In this tutorial I demonstrate the usage of Datasets, DataLoaders, LightningDataModule for our use case with tabular data. The implementation and usage of these modules are slightly different than for more common deep learning use cases as for natural language processing (NLP) or computer vision (CV). The following section explains the concepts of how those modules are used for tabular data and should provide a guideline for the code implementation below.
 
@@ -124,7 +132,7 @@ In this tutorial I demonstrate the usage of Datasets, DataLoaders, LightningData
     - `Dataset`
     Class to create tabular dataset to follow PyTorch Lightning conventions (eventhough we are working on tabular data), where the data for feature variables and the target variable are often already provided in a combined way (e.g. contrary to images and corresbonding labels). For "classical" approaches a Dataset class is often used at the start of the machine learning pipeline to provide the data in a format (e.g. combine images and corresponding labels, which are typically not provided in the same file) for further processing and training.
 
-### Dataset for Tabular Data (Code Implementation)
+### 5.1.1. Dataset for Tabular Data (Code Implementation)
 
 The `TabularDataset` class is a custom implementation of PyTorch's `Dataset` for handling tabular data in classification and regression tasks. It is designed to preprocess tabular data, converting it into tensor format suitable for neural network training. The class supports both continuous and categorical features, with categorical columns assumed to be ordinal or label-encoded beforehand. It manages the target variable (`y`), which is handled as either a floating-point tensor for regression or an integer tensor for classification. The class ensures efficient data representation for use in PyTorch's data pipelines by handling necessary transformations such as type correction and tensor conversion. While data preprocessing (e.g., using `sklearn`) is typically done in a `LightningDataModule`, this class finalizes the data transformation and provides it in tensor form for consumption by the PyTorch DataLoader. Key features include flexibility in handling various column types, support for multiple task types (classification and regression), and integration with PyTorch’s data loading mechanism. The implementation of the class is not related to our use case data and can be reused for general purposes.
 
@@ -221,7 +229,7 @@ class TabularDataset(Dataset):
         }
 ```
 
-### LightningDataModule (Code Implementation)
+### 5.1.2. LightningDataModule (Code Implementation)
 
 The `TabularDataModuleClassificationPACKAGING` class is a specialized implementation of PyTorch Lightning's `LightningDataModule` designed to handle tabular data for classification tasks. This class focuses on the specific requirements of a packaging dataset of the given use case, containing features like material number, brand, product area, and packaging category. It provides a reusable framework for preprocessing, data splitting, and handling both continuous and categorical variables. The data transformation pipeline includes imputation, scaling for continuous features, and ordinal encoding for categorical features, with a dedicated preprocessing pipeline for training, validation, testing, and inference scenarios.
 
@@ -605,7 +613,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             return None
 ```
 
-### Instantiation of TabularDataModuleClassificationPACKAGING with our use case data (Code Implementation)
+### 5.1.3. Instantiation of TabularDataModuleClassificationPACKAGING with our use case data (Code Implementation)
 
 ```python
 dm = TabularDataModuleClassificationPACKAGING(
@@ -639,11 +647,11 @@ dm.train_dataset.get_dataframe.head(5)
 
 ![Processed Dataset](docs/README_PyTorchLightning_Tutorial/dataset_processed.png)
 
-## LightningModule & LightningTrainer for Tabular Data
+## 5.2. LightningModule & LightningTrainer for Tabular Data
 
 The LightningModule and the LightningTrainer can be used straight forward for tabular data.
 
-### LightningModule (Code Implementation)
+### 5.2.1. LightningModule (Code Implementation)
 
 The `MulticlassTabularLightningModule` is a PyTorch Lightning `LightningModule` designed for multiclass classification tasks on tabular data. This module is built to handle the entire training and evaluation pipeline for a multiclass classification model. It supports a customizable neural network model, loss function, and metrics for tracking performance across training, validation, and test sets. The class is design in a way that it is not specific to our use case data and can be reused for other multiclass classification tasks without any adaptation needed.
 
@@ -720,7 +728,7 @@ class MulticlassTabularLightningModule(L.LightningModule):
         return torch.optim.Adam(params=self.parameters(), lr=self.learning_rate)
 ```
 
-### Multi-Layer-Perceptron (MLP) Model Definition (Code Implementation)
+### 5.2.2. Multi-Layer-Perceptron (MLP) Model Definition (Code Implementation)
 
 The `MulticlassTabularMLP` is a multi-layer perceptron (MLP) model designed for multiclass classification tasks on tabular data. This model is highly customizable, allowing for adjustable input size, output size (number of classes), hidden layer configuration, activation functions, dropout rates, and normalization options. The MLP consists of an input layer, multiple hidden layers, and an output layer, with each hidden layer followed by an optional dropout layer and layer normalization.
 
@@ -783,7 +791,7 @@ class MulticlassTabularMLP(nn.Module):
         return self.sequential(network_input)
 ```
 
-### MLP with Categorical Feature Embeddings Model Definition (Code Implementation)
+### 5.2.3. MLP with Categorical Feature Embeddings Model Definition (Code Implementation)
 
 ![Model Architecture - Embedding MLP](docs/README_PyTorchLightning_Tutorial/embMLP_architecture.png)
 *Image Source: [[Link to Source](https://towardsdatascience.com/deep-learning-for-tabular-data-using-pytorch-1807f2858320)]*
@@ -900,7 +908,7 @@ embedding_sizes_cat_features
 
 ![Embedding Sizes](docs/README_PyTorchLightning_Tutorial/embedding_sizes.png)
 
-### Instantiation of MLP Model and MulticlassTabularLightningModule (Code Implementation)
+### 5.2.4. Instantiation of MLP Model and MulticlassTabularLightningModule (Code Implementation)
 
 ```python
 # NOTE: Run dm.prepare_data() and dm.setup() to get information from the dataset to build your model.
@@ -942,7 +950,7 @@ lightningmodel = MulticlassTabularLightningModule(
 )
 ```
 
-### Training & Evaluation with LightningTrainer (Code Implementation)
+### 5.2.5. Training & Evaluation with LightningTrainer (Code Implementation)
 
 The model is trained using the `trainer.fit()` method, with both training and validation data provided via respective data loaders. This step combines all previous steps, the data is passed through the training and validation loops by the `trainer` that integrates with our `lightningmodel` and `datamodule`. The script is designed to train and evaluate our multi-layer perceptron (MLP) model with the following key steps in the workflow:
 
@@ -1046,7 +1054,7 @@ print(classification_report(y_test, preds_y_test))
 ![embMLP Classification Report](docs/README_PyTorchLightning_Tutorial/embMLP_classification_report.png)
 *embMLP Classification Report*
 
-# Summary
+# 6. Summary
 
 In this blog post, we explored a comprehensive framework for implementing deep learning models on tabular datasets, with a focus on multiclass classification. The key components we covered include:
 
@@ -1063,3 +1071,24 @@ This post equips readers with the knowledge to build and train effective deep le
 Related frameworks: [PyTorch Tabular](https://pytorch-tabular.readthedocs.io/en/latest/)
 "PyTorch Tabular is a powerful library that aims to simplify and popularize the application of deep learning techniques to tabular data."
 The library provieds a high-level API for deep learning on tabular data including data preprocessing, model training, and model evaluation. The downside is that the abstraction layer it provides does not allow for fine-grained control over the machine learning workflow.
+
+# 7. Code structure
+```Python
+Directory-tree structure:  
+|-- environment.yml  
+|-- README.md  
+|-- README_ml_packaging_classification.md  
+|-- notebooks  
+|   |-- 20_clf_pipeline_pytorch_embeddingMLP_optuna.ipynb # Embedding MLP with Optuna  
+|   |-- 20_clf_pipeline_pytorch_embeddingMLP.ipynb # Embedding MLP  
+|   |-- 20_clf_pipeline_pytorch_MLP_optuna.ipynb # MLP with Optuna  
+|   |-- 20_clf_pipeline_pytorch_MLP.ipynb # MLP, including deteiled code description  
+|-- src  
+|   |-- pytorch_tabular # Modules for Tabular Data using PyTorch Lightning
+|   |   |-- callbacks.py # callbacks for Lightning Trainer  
+|   |   |-- enciders.py # custom encoders for data preprocessing  
+|   |   |-- tabular_lightning.py # lightning classes for tabular data  
+|   |   |-- tabular_lightning_utils.py # for shared utilitie functions  
+|   |   |-- tabular_models.py # custom models for Pytorch/Lightning  
+|   |-- utils.py # for shared functions  
+```
