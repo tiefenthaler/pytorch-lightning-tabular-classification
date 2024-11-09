@@ -1073,7 +1073,8 @@ Related frameworks: [PyTorch Tabular](https://pytorch-tabular.readthedocs.io/en/
 The library provieds a high-level API for deep learning on tabular data including data preprocessing, model training, and model evaluation. The downside is that the abstraction layer it provides does not allow for fine-grained control over the machine learning workflow.
 
 # 7. Code structure
-```Python
+
+```
 Directory-tree structure:  
 |-- environment.yml  
 |-- README.md  

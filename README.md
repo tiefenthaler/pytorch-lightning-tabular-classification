@@ -72,7 +72,7 @@ As the showcase is intended to reflect the data science process to tackle the us
 
 # 5. Code structure
 
-```Python
+```
 Directory-tree structure:  
 |-- environment.yml  
 |-- README.md  
