@@ -1,4 +1,6 @@
+from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
+from numpy._typing._array_like import NDArray
 import pandas as pd
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.pipeline import Pipeline
@@ -12,11 +14,11 @@ class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneF
     Supports numpy arrays pandas Series and pandas DataFrames as input and output.
     """
 
-    def _transform_unknown_values(self, X):
+    def _transform_unknown_values(self, X) -> NDArray:
         """Generalized function to transform encoded values."""
         return np.where(X == -1, 0, X + 1)
 
-    def _inverse_transform_unknown_values(self, X):
+    def _inverse_transform_unknown_values(self, X) -> NDArray:
         """Generalized function to inverse transform values."""
         return np.where(X == 0, -1, X - 1)
 
@@ -24,7 +26,7 @@ class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneF
         # Fit the OrdinalEncoderExtension
         return self
 
-    def transform(self, X):
+    def transform(self, X) -> NDArray | pd.Series[float] | pd.DataFrame:
         # Handle different input types
         if isinstance(X, np.ndarray):
             X_transformed = self._transform_unknown_values(X)
@@ -41,7 +43,7 @@ class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneF
 
         return X_transformed
 
-    def inverse_transform(self, X):
+    def inverse_transform(self, X) -> NDArray | pd.Series[float] | pd.DataFrame:
         # Handle different input types for inverse transformation
         if isinstance(X, np.ndarray):
             X_inverse = self._inverse_transform_unknown_values(X)
@@ -56,7 +58,7 @@ class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneF
 
         return X_inverse
 
-    def get_feature_names_out(self, *args, **params):
+    def get_feature_names_out(self, *args, **params) -> List[str]:
         return self.columns_
 
 
