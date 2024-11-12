@@ -17,6 +17,9 @@ notebooks/logs
 # Optuna
 notebooks/optuna_storage/
 
+# MLflow
+mlruns
+
 # Pytest
 .pytest_cache
 tests/.pytest_cache
