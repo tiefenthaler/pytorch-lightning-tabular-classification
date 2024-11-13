@@ -243,10 +243,13 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
                 ('nan_label', OrdinalEncoderExtensionUnknowns()),
             ])
             # apply both pipeline on seperate columns using "ColumnTransformer"
-            self.preprocess_pipeline = ColumnTransformer(transformers=[
-                ('number', numeric_feature_pipeline, numerical_features),
-                ('category', categorical_feature_pipeline, categorical_features)],
-                verbose_feature_names_out=False)
+            self.preprocess_pipeline = ColumnTransformer(
+                transformers=[
+                    ('number', numeric_feature_pipeline, numerical_features),
+                    ('category', categorical_feature_pipeline, categorical_features)
+                ],
+                verbose_feature_names_out=False
+            )
             self.preprocess_pipeline.set_output(transform="pandas")
 
             # ordinal is used instead of label encoder to avoid conflicts with inference or
