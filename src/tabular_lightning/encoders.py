@@ -26,7 +26,7 @@ class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneF
         # Fit the OrdinalEncoderExtension
         return self
 
-    def transform(self, X) -> NDArray | pd.Series[float] | pd.DataFrame:
+    def transform(self, X) -> NDArray | pd.Series | pd.DataFrame:
         # Handle different input types
         if isinstance(X, np.ndarray):
             X_transformed = self._transform_unknown_values(X)
@@ -43,7 +43,7 @@ class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneF
 
         return X_transformed
 
-    def inverse_transform(self, X) -> NDArray | pd.Series[float] | pd.DataFrame:
+    def inverse_transform(self, X) -> NDArray | pd.Series | pd.DataFrame:
         # Handle different input types for inverse transformation
         if isinstance(X, np.ndarray):
             X_inverse = self._inverse_transform_unknown_values(X)

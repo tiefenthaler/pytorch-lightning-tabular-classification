@@ -18,7 +18,7 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from torchmetrics import Metric
 
-from . import encoders
+from .encoders import OrdinalEncoderExtensionUnknowns
 
 
 class TabularDataset(Dataset):
@@ -240,7 +240,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             categorical_feature_pipeline = Pipeline(steps=[
                 ('impute', SimpleImputer(strategy='most_frequent')),
                 ('ordinal', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)), # ordinal is used instead of label encoder to avoid conflicts with inference or
-                ('nan_label', encoders.OrdinalEncoderExtensionUnknowns()),
+                ('nan_label', OrdinalEncoderExtensionUnknowns()),
             ])
             # apply both pipeline on seperate columns using "ColumnTransformer"
             self.preprocess_pipeline = ColumnTransformer(transformers=[
