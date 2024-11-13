@@ -24,8 +24,10 @@ def f1_score_macro(
     average="macro",
     sample_weight=None,
     zero_division="warn",
-):
+) -> ndarray | float | float | float | float:
     """Compute the F1 score, also known as balanced F-score or F-measure.
+    This function sets the average parameter to "macro" by default, so the function can be more easily used
+    in the context of a pipeline without having to specify the average parameter.
 
     The F1 score can be interpreted as a harmonic mean of the precision and
     recall, where an F1 score reaches its best value at 1 and worst score at 0.
