@@ -29,7 +29,6 @@ dependencies:
 - pytorch
 - lightning
 - optuna
-- optuna.integration
 - imbalanced-learn
 - mlflow
 - pycaret>=3.0
@@ -40,3 +39,4 @@ dependencies:
   - black
   - 'black[jupyter]'
   - isort
+  - optuna.integration
