@@ -227,7 +227,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         as well as for inverse transformations.
         TabularDatasetPACKAGING prepares data for prediction only accordingly to support _preprocessing_pipeline.
         """
-        # create pipeline for fit scenario, use existing pipeline for inference scenario
+        # create pipeline for fit scenario, use existing pipeline for inference scenario.
         if stage == "fit":
             # numerical feature processing
             numerical_features = X.select_dtypes(include='number').columns.tolist()
@@ -239,10 +239,10 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             categorical_features = X.select_dtypes(exclude='number').columns.tolist()
             categorical_feature_pipeline = Pipeline(steps=[
                 ('impute', SimpleImputer(strategy='most_frequent')),
-                ('ordinal', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)), # ordinal is used instead of label encoder to avoid conflicts with inference or
+                ('ordinal', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)), # ordinal is used instead of label encoder to avoid conflicts with inference.
                 ('nan_label', OrdinalEncoderExtensionUnknowns()),
             ])
-            # apply both pipeline on seperate columns using "ColumnTransformer"
+            # apply both pipeline on seperate columns using "ColumnTransformer".
             self.preprocess_pipeline = ColumnTransformer(
                 transformers=[
                     ('number', numeric_feature_pipeline, numerical_features),
@@ -253,9 +253,8 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             self.preprocess_pipeline.set_output(transform="pandas")
 
             # ordinal is used instead of label encoder to avoid conflicts with inference or
-            # conflicts caused by data splits of categories with low numerber of classesonly scenarios
+            # conflicts caused by data splits of categories with low numerber of classesonly scenarios.
             self.label_encoder_target = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
-            # self.label_encoder_target = LabelEncoder()
 
         if stage == "fit":
             X_transformed = self.preprocess_pipeline.fit_transform(X)
@@ -281,7 +280,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         self.data = pd.read_csv(self.data_dir, sep="\t")
         # for inference mode, as the target might not be provided in the data, ensures pre-processing pipeline completes correctly.
         if 'packaging_category' not in self.data.columns:
-            self.data.insert(len(self.data.columns), 'packaging_category', np.nan) # Insert an empty column at the end (position=-1)
+            self.data.insert(len(self.data.columns), 'packaging_category', np.nan) # Insert an empty column at the end (position=-1).
         # define the subset
         self.data = self.data[[
             'material_number',

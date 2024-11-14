@@ -101,7 +101,7 @@ class MulticlassTabularCatEmbeddingMLP(nn.Module):
 
         ### define the Embedding MLP ###
         ## embedding layers
-        # cont featurres
+        # cont features
         self.cont_normalizing = nn.BatchNorm1d(len(self.continuous_cols))
         # cat features
         self.cat_embeddings = nn.ModuleDict()
@@ -146,11 +146,11 @@ class MulticlassTabularCatEmbeddingMLP(nn.Module):
             for idx, (name, emb) in enumerate(self.cat_embeddings.items()):
                 output_vectors[name] = emb(x["categorical"][:, idx])
             embed_vector_cat = torch.cat(list(output_vectors.values()), dim=1)
-        # output_vector_emded
+        # output_vector_embed
         if embed_vector_cont is None:
-            output_vector_emded = embed_vector_cat
+            output_vector_embed = embed_vector_cat
         else:
-            output_vector_emded = torch.cat([embed_vector_cont, embed_vector_cat], dim=1)
+            output_vector_embed = torch.cat([embed_vector_cont, embed_vector_cat], dim=1)
 
         ### forward hidden layers ###
-        return self.mlp_layers(output_vector_emded)
+        return self.mlp_layers(output_vector_embed)
