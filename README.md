@@ -14,6 +14,8 @@ Find the full code in the repository [pytorch-lightning-tabular-classification](
 - [3. Use case description:](#3-use-case-description)
 - [4. Structure of the showcase](#4-structure-of-the-showcase)
 - [5. Code structure](#5-code-structure)
+- [Google Colab X Google Drive (quick start)](#google-colab-x-google-drive-quick-start)
+- [Azure ML Service (quick start)](#azure-ml-service-quick-start)
 
 # 2. Packaging Classification a Tabular Data Use Case using Machine Learning
 
@@ -91,3 +93,33 @@ Directory-tree structure:
 |   |   |-- tabular_models.py # custom models for Pytorch/Lightning  
 |   |-- utils.py # for shared functions  
 ```
+
+# Google Colab X Google Drive (quick start)
+
+Some notebooks include code to use google colab with google drive.
+Google colab is a free cloud service for running python code in the browser and has native integration with google drive.
+To run the notebooks, you need to mount your google drive to the colab environment (code implementation).
+Ensure to define the google drive path in the code (colab config file).
+The additional packages needed in colab are included in the code implemenation (kernel restart required).
+It is recommended to run those notebooks on GPU or on a machine with high amount of CPU cores (only limited available on free tier).
+It is not recommended to run the notebooks on the free tier CPU machine (only 2 cores available) for those notebooks.
+
+# Azure ML Service (quick start)
+
+How to run the code in Azure ML Service:
+
+- Create a new Azure ML Service workspace.
+- Create a new Azure ML Service compute instance.
+- Clone the repository to compute instance under "/home/azureuser/cloudfiles/code/Users/<user.name>/"
+  to ensure storage of the code in the related storage account (File Share).
+- optinal but recommended: install [Miniforge](https://github.com/conda-forge/miniforge) on compute instance for fast virtual python environment creation.
+  - Run the following commands in the terminal:
+   ```
+    curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+    bash Miniforge3-$(uname)-$(uname -m).sh
+    ```
+  - Restart terminal to use mamba as package manager.
+- Create a new virtual environment with the following command in the terminal from the root directory of the repository:  
+  ```mamba env create -f environment.yml```
+- Create/upload your config file to define your directory pathes accodringly.
+- Activate the environment respectivley select the environment in the jupyter notebook (the kernel can be selected under python kernel dropdown menu) to run the code/notebooks.

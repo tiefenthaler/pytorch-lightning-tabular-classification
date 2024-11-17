@@ -40,3 +40,4 @@ dependencies:
   - black
   - 'black[jupyter]'
   - isort
+  - optuna.integration
