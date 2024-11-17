@@ -1,0 +1,5 @@
+project_directory: "/home/azureuser/ml_packaging_classification/"
+data_directory: "/home/azureuser/ml_packaging_classification//data"
+optuna_storage_directory: "/home/azureuser/ml_packaging_classification/notebooks/optuna_storage"
+pycaret_exp_storage_directory: "/home/azureuser/ml_packaging_classification/notebooks/pycaret_exp_storage"
+autogluon_exp_storage_directory: "/home/azureuser/ml_packaging_classification/notebooks"

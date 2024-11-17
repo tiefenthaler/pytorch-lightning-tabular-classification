@@ -36,6 +36,7 @@ dependencies:
 - pytest
 - pip:
   # pip installation
+  # - optuna.integration
   - black
   - 'black[jupyter]'
   - isort
