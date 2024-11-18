@@ -1,29 +1,45 @@
 # Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
+# If you need more help, visit the Dockerfile reference guide at https://docs.docker.com/go/dockerfile-reference/
 
 # Create a docker conda image
-# FROM mcr.microsoft.com/devcontainers/anaconda:0-3
-FROM continuumio/miniconda3
+# Official Available Dev Container Templates, see https://containers.dev/templates
+# NOTE: Non Dev Container *Conda Installations might lead to errors during building the container.
+FROM mcr.microsoft.com/devcontainers/miniconda
+
+USER root
+
+# Set the working directory
+# WORKDIR /workspace
 
 # Copy the environment.yml file to the container. Also
 # copy "noop.txt" so the COPY instruction does not fail if no environment.yml exists.
-# COPY environment.yml* .devcontainer/noop.txt /tmp/conda-tmp/
-COPY environment.yml* /tmp/conda-tmp/
+COPY environment.yml* noop.txt /workspace/requirements/
 
-# Use Conda to create/update python environment
-# RUN if [ -f "/tmp/conda-tmp/environment_conda.yml" ]; then umask 0002 \
-#     && /opt/conda/bin/conda env update -n base -f /tmp/conda-tmp/environment_conda.yml; fi \
-#     && rm -rf /tmp/conda-tmp
+# Make RUN commands use `bash --login`:
+# SHELL ["/bin/bash", "--login", "-c"]
 
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+# Install linux packages
+RUN apt-get update
+# Install git, process tools
+# RUN apt-get update && apt-get upgrade -y && apt-get install -y git
+RUN apt-get update && apt-get -y install git procps build-essential curl swig
+RUN git config --global --add safe.directory /workspace
 
-# WORKDIR /workspace
+# Add the conda directory to your Linux PATH, since this is not done automatically after installation.
+RUN conda init bash
 
-# Expose the port that the application listens on.
-# EXPOSE 8000
+# Update conda, install and set libmamba solver
+RUN conda update -n base conda -y
+RUN conda install -n base conda-libmamba-solver
+RUN conda config --set solver libmamba
 
-# Command to run on container start.
-# CMD python main.py
+# Create conda env (for your data science work)
+RUN conda env create --file /workspace/requirements/environment.yml
+
+RUN conda install ipython_genutils
+RUN conda install ipykernel
+RUN ipython kernel install --user --name=env1
+
+# The code to run when container is started:
+# Common practice to keep the Docker container running without performing any significant action. 
+ENTRYPOINT ["tail", "-f", "/dev/null"]
