@@ -10,9 +10,13 @@ notebooks/mlruns
 logs.log
 catboost_info/
 
+# AutoGLuon
+experiments_logs/AutogluonModels
+
 # Pytorch Lightning
 notebooks/lightning_logs/
 notebooks/logs
+experiments_logs/lightning/lightning_logs
 
 # Optuna
 notebooks/optuna_storage/
