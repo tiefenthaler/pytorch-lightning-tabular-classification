@@ -5,6 +5,7 @@ from typing import Dict, Iterable, List, Literal, Optional, Tuple, Union
 import torch
 from torch import nn
 
+
 class MulticlassTabularMLP(nn.Module):
     def __init__(
         self,
@@ -57,7 +58,9 @@ class MulticlassTabularMLP(nn.Module):
     def forward(self, x: Dict[str, torch.Tensor]) -> torch.Tensor:
         """Forward pass through the MLP."""
         # concatenate continuous and categorical features
-        network_input = torch.cat((x["continuous"], x["categorical"]), dim=1) # NOTE: converts all data types to float32 (respective to the data type of the first element)
+        network_input = torch.cat(
+            (x["continuous"], x["categorical"]), dim=1
+        )  # NOTE: converts all data types to float32 (respective to the data type of the first element)
         return self.sequential(network_input)
 
 
@@ -111,7 +114,9 @@ class MulticlassTabularCatEmbeddingMLP(nn.Module):
                 embedding_sizes[name][1],
             )
         ## input layer mlp
-        mlp_input_size = sum(value[1] for value in embedding_sizes.values()) + len(self.continuous_cols)
+        mlp_input_size = sum(value[1] for value in embedding_sizes.values()) + len(
+            self.continuous_cols
+        )
         module_list = [nn.Linear(mlp_input_size, hidden_size), activation_class()]
         if dropout is not None:
             module_list.append(nn.Dropout(dropout))
@@ -132,7 +137,9 @@ class MulticlassTabularCatEmbeddingMLP(nn.Module):
     def forward(self, x: Dict[str, torch.Tensor]) -> torch.Tensor:
         """Forward pass through the embMLP."""
 
-        assert "continuous" in x or "categorical" in x, "x must contain either continuous or categorical features"
+        assert (
+            "continuous" in x or "categorical" in x
+        ), "x must contain either continuous or categorical features"
 
         ### forward embedding layers ###
         # cont features

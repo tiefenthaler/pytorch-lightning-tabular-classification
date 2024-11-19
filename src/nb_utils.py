@@ -1,8 +1,10 @@
-import time
 import os
-import numpy as np
+import time
 from datetime import datetime
+
+import numpy as np
 from IPython.display import clear_output
+
 
 def keep_cumpute_alive_with_cpu_activity(duration_hours=1, sleep_time=30) -> None:
     """

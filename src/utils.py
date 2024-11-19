@@ -3,13 +3,14 @@
 from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import sklearn
 import sklearn.pipeline
 from numpy import ndarray
-from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.base import BaseEstimator
+
 # from sklearn.metrics import mean_squared_error
 from sklearn.metrics import classification_report, fbeta_score
 from sklearn.model_selection import StratifiedKFold
@@ -110,14 +111,14 @@ def check_model_learning_CV(
 
         # get performance results for given split
         report_train.append(
-            classification_report(
-                y_train_transfomed, y_train_pred, output_dict=True
-            )["macro avg"]["f1-score"]
+            classification_report(y_train_transfomed, y_train_pred, output_dict=True)["macro avg"][
+                "f1-score"
+            ]
         )
         report_test.append(
-            classification_report(
-                y_test_transformed, y_test_pred, output_dict=True
-            )["macro avg"]["f1-score"]
+            classification_report(y_test_transformed, y_test_pred, output_dict=True)["macro avg"][
+                "f1-score"
+            ]
         )
 
     performance_train = np.array(report_train)
@@ -221,29 +222,20 @@ def calculate_weighted_cost(
 
     elif method == "weighted":
         if not class_weights:
-            weights = np.sum(conf_matrix, axis=1) / np.sum(
-                conf_matrix
-            )  # class distribution
+            weights = np.sum(conf_matrix, axis=1) / np.sum(conf_matrix)  # class distribution
         else:
             # Convert class_weights dict to array in the order of classes in the confusion matrix
             weights = np.array(
                 [list(class_weights.values())[i] for i in range(conf_matrix.shape[0])]
             )
-        cost = np.sum(
-            weights * (cost_TP * TP + cost_FN * FN + cost_FP * FP + cost_TN * TN)
-        )
+        cost = np.sum(weights * (cost_TP * TP + cost_FN * FN + cost_FP * FP + cost_TN * TN))
 
     elif method == "micro":
         total_TP = np.sum(TP)
         total_FP = np.sum(FP)
         total_FN = np.sum(FN)
         total_TN = np.sum(TN)
-        cost = (
-            cost_TP * total_TP
-            + cost_FN * total_FN
-            + cost_FP * total_FP
-            + cost_TN * total_TN
-        )
+        cost = cost_TP * total_TP + cost_FN * total_FN + cost_FP * total_FP + cost_TN * total_TN
 
     else:
         raise ValueError(
@@ -251,4 +243,3 @@ def calculate_weighted_cost(
         )
 
     return round(cost, 2)
-    

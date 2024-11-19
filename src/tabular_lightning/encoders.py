@@ -1,7 +1,8 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
+
 import numpy as np
-from numpy._typing._array_like import NDArray
 import pandas as pd
+from numpy._typing._array_like import NDArray
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OrdinalEncoder
@@ -65,22 +66,23 @@ class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneF
 # Example usage
 if __name__ == "__main__":
     # Sample data as DataFrame
-    data_df = pd.DataFrame({
-        'category': ['a', 'b', 'c', 'a'],
-        'category2': ['1', '3', '5', '3']
-    })
+    data_df = pd.DataFrame({"category": ["a", "b", "c", "a"], "category2": ["1", "3", "5", "3"]})
 
-    test_df = pd.DataFrame({
-        'category': ['a', 'b', 'c', 'a', 'unknown'],
-        'category2': ['1', '3', '5', '3', '999']
-    })
-    
+    test_df = pd.DataFrame(
+        {"category": ["a", "b", "c", "a", "unknown"], "category2": ["1", "3", "5", "3", "999"]}
+    )
+
     # Create the pipeline for DataFrame
-    pipeline_df = Pipeline(steps=[
-        ('ordinal_encoder', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)),
-        ('custom_transformer', OrdinalEncoderExtensionUnknowns())
-    ])
-    
+    pipeline_df = Pipeline(
+        steps=[
+            (
+                "ordinal_encoder",
+                OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1),
+            ),
+            ("custom_transformer", OrdinalEncoderExtensionUnknowns()),
+        ]
+    )
+
     # Fit and transform the DataFrame
     transformed_df = pipeline_df.fit_transform(data_df)
     print("Transformed DataFrame:")
@@ -92,6 +94,6 @@ if __name__ == "__main__":
     print(transformed_df)
 
     # Inverse transform the DataFrame
-    inverse_df = pipeline_df.named_steps['custom_transformer'].inverse_transform(transformed_df)
+    inverse_df = pipeline_df.named_steps["custom_transformer"].inverse_transform(transformed_df)
     print("\nInverse Transformed DataFrame:")
     print(inverse_df)

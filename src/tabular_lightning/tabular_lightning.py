@@ -12,8 +12,13 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import (LabelEncoder, MinMaxScaler, OneHotEncoder,
-                                   OrdinalEncoder, StandardScaler)
+from sklearn.preprocessing import (
+    LabelEncoder,
+    MinMaxScaler,
+    OneHotEncoder,
+    OrdinalEncoder,
+    StandardScaler,
+)
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from torchmetrics import Metric
@@ -107,9 +112,15 @@ class TabularDataset(Dataset):
         """
 
         return {
-            "continuous": (torch.as_tensor(self.continuous_X[idx]) if self.continuous_cols else torch.Tensor()),
-            "categorical": (torch.as_tensor(self.categorical_X[idx]) if self.categorical_cols else torch.Tensor()), #  dtype=torch.int64
-            "target": torch.as_tensor(self.y[idx]) # , dtype=torch.long
+            "continuous": (
+                torch.as_tensor(self.continuous_X[idx]) if self.continuous_cols else torch.Tensor()
+            ),
+            "categorical": (
+                torch.as_tensor(self.categorical_X[idx])
+                if self.categorical_cols
+                else torch.Tensor()
+            ),  #  dtype=torch.int64
+            "target": torch.as_tensor(self.y[idx]),  # , dtype=torch.long
         }
 
 
@@ -173,7 +184,9 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         self.target = target
         self.oversampling = oversampling
         self.batch_size = batch_size
-        self.batch_size_inference = self.batch_size if not batch_size_inference else batch_size_inference
+        self.batch_size_inference = (
+            self.batch_size if not batch_size_inference else batch_size_inference
+        )
         self.num_workers_train = num_workers_train
         self.num_workers_predict = num_workers_predict
         self.kwargs_dataloader_trainvaltest = kwargs_dataloader_trainvaltest
@@ -206,13 +219,15 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             data[self.continuous_cols] = data[self.continuous_cols].astype(np.float32).values
         if len(self.categorical_cols) > 0:
             # ensure that all categorical variables are of type 'object'
-            data[self.categorical_cols] = data[self.categorical_cols].astype('object').values
+            data[self.categorical_cols] = data[self.categorical_cols].astype("object").values
 
         if (len(self.continuous_cols) > 0) or (len(self.categorical_cols) > 0):
             self.feature_cols = self.continuous_cols + self.categorical_cols
             pass
         else:
-            raise TypeError("Missing required argument: 'continuous_cols' and/or 'categorical_cols'")
+            raise TypeError(
+                "Missing required argument: 'continuous_cols' and/or 'categorical_cols'"
+            )
 
         # Define a subset based on continuous_cols and categorical_cols
         data = data[self.continuous_cols + self.categorical_cols + self.target]
@@ -230,40 +245,57 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         # create pipeline for fit scenario, use existing pipeline for inference scenario.
         if stage == "fit":
             # numerical feature processing
-            numerical_features = X.select_dtypes(include='number').columns.tolist()
-            numeric_feature_pipeline = Pipeline(steps=[
-                ('impute', SimpleImputer(strategy='median')),
-                ('scale', StandardScaler())
-            ])
+            numerical_features = X.select_dtypes(include="number").columns.tolist()
+            numeric_feature_pipeline = Pipeline(
+                steps=[("impute", SimpleImputer(strategy="median")), ("scale", StandardScaler())]
+            )
             # categorical feature processing
-            categorical_features = X.select_dtypes(exclude='number').columns.tolist()
-            categorical_feature_pipeline = Pipeline(steps=[
-                ('impute', SimpleImputer(strategy='most_frequent')),
-                ('ordinal', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)), # ordinal is used instead of label encoder to avoid conflicts with inference.
-                ('nan_label', OrdinalEncoderExtensionUnknowns()),
-            ])
+            categorical_features = X.select_dtypes(exclude="number").columns.tolist()
+            categorical_feature_pipeline = Pipeline(
+                steps=[
+                    ("impute", SimpleImputer(strategy="most_frequent")),
+                    # ordinal is used instead of label encoder to avoid conflicts with inference.
+                    (
+                        "ordinal",
+                        OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1),
+                    ),
+                    ("nan_label", OrdinalEncoderExtensionUnknowns()),
+                ]
+            )
             # apply both pipeline on seperate columns using "ColumnTransformer".
             self.preprocess_pipeline = ColumnTransformer(
                 transformers=[
-                    ('number', numeric_feature_pipeline, numerical_features),
-                    ('category', categorical_feature_pipeline, categorical_features)
+                    ("number", numeric_feature_pipeline, numerical_features),
+                    ("category", categorical_feature_pipeline, categorical_features),
                 ],
-                verbose_feature_names_out=False
+                verbose_feature_names_out=False,
             )
             self.preprocess_pipeline.set_output(transform="pandas")
 
             # ordinal is used instead of label encoder to avoid conflicts with inference or
             # conflicts caused by data splits of categories with low numerber of classesonly scenarios.
-            self.label_encoder_target = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
+            self.label_encoder_target = OrdinalEncoder(
+                handle_unknown="use_encoded_value", unknown_value=-1
+            )
 
         if stage == "fit":
             X_transformed = self.preprocess_pipeline.fit_transform(X)
-            y_transformed = pd.DataFrame(data=self.label_encoder_target.fit_transform(y.values.reshape(-1, 1)), index=y.index, columns=y.columns)
-        elif stage == 'inference':
+            y_transformed = pd.DataFrame(
+                data=self.label_encoder_target.fit_transform(y.values.reshape(-1, 1)),
+                index=y.index,
+                columns=y.columns,
+            )
+        elif stage == "inference":
             X_transformed = self.preprocess_pipeline.transform(X)
-            y_transformed = pd.DataFrame(data=self.label_encoder_target.transform(y.values.reshape(-1, 1)), index=y.index, columns=y.columns)
+            y_transformed = pd.DataFrame(
+                data=self.label_encoder_target.transform(y.values.reshape(-1, 1)),
+                index=y.index,
+                columns=y.columns,
+            )
         else:
-            raise ValueError(f"Missing required argument 'stage', must be 'fit' or 'inference', got {stage}")
+            raise ValueError(
+                f"Missing required argument 'stage', must be 'fit' or 'inference', got {stage}"
+            )
 
         return pd.concat([X_transformed, y_transformed], axis=1)
 
@@ -279,27 +311,32 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         # USE CASE SPECIFIC DATA HANDLING
         self.data = pd.read_csv(self.data_dir, sep="\t")
         # for inference mode, as the target might not be provided in the data, ensures pre-processing pipeline completes correctly.
-        if 'packaging_category' not in self.data.columns:
-            self.data.insert(len(self.data.columns), 'packaging_category', np.nan) # Insert an empty column at the end (position=-1).
+        if "packaging_category" not in self.data.columns:
+            self.data.insert(
+                len(self.data.columns), "packaging_category", np.nan
+            )  # Insert an empty column at the end (position=-1).
         # define the subset
-        self.data = self.data[[
-            'material_number',
-            'brand',
-            'product_area',
-            'core_segment',
-            'component',
-            'manufactoring_location',
-            'characteristic_value',
-            'material_weight',
-            'packaging_code',
-            'packaging_category',
-        ]]
-        self.data['material_number'] = self.data['material_number'].astype('object')
+        self.data = self.data[
+            [
+                "material_number",
+                "brand",
+                "product_area",
+                "core_segment",
+                "component",
+                "manufactoring_location",
+                "characteristic_value",
+                "material_weight",
+                "packaging_code",
+                "packaging_category",
+            ]
+        ]
+        self.data["material_number"] = self.data["material_number"].astype("object")
 
         if self.oversampling:
             # NOTE: Oversampling so each class has at least 100 sample; to properly represent minority classes during training and evaluation
+            # Define features and target: the last column is the target, ensured by calling 'prepare_data' upfront
             X = self.data.iloc[:, :-1]
-            y = self.data.iloc[:, -1]  # the last column is the target, ensured based on section before (# select a subset)
+            y = self.data.iloc[:, -1]  # the last column is the target
             dict_oversmapling = {
                 "Metal Cassette": 100,
                 "Carton tube with or w/o": 100,
@@ -307,7 +344,9 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
                 "Fabric packaging": 100,
                 "Book packaging": 100,
             }
-            oversampler = RandomOverSampler(sampling_strategy=dict_oversmapling, random_state=self.SEED)
+            oversampler = RandomOverSampler(
+                sampling_strategy=dict_oversmapling, random_state=self.SEED
+            )
             X_oversample, y_oversample = oversampler.fit_resample(X, y)
             self.data = pd.concat([X_oversample, y_oversample], axis=1)
 
@@ -315,7 +354,8 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         self.data = self._prepare_data(self.data)
 
         # shuffle data
-        if shuffle is True: self.data = self.data.sample(frac=1)
+        if shuffle is True:
+            self.data = self.data.sample(frac=1)
 
         self.n_samples = self.data.shape[0]
 
@@ -340,9 +380,9 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         if not self._prepare_data_called:
             raise RuntimeError("'prepare_data' needs to be called before 'setup'")
 
-        # Define features and target
+        # Define features and target: the last column is the target, ensured by calling 'prepare_data' upfront
         X = self.data.iloc[:, :-1]
-        y = self.data.iloc[:, -1]  # the last column is the target, ensured by calling 'prepare_data' upfront
+        y = self.data.iloc[:, -1]  # the last column is the target
 
         # Define data for train, val and test and for prediction
         if stage in ("fit", "validate", "test"):
@@ -357,7 +397,11 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
                 y_test = pd.DataFrame(data=y_test, columns=[y.name])
                 if (self.val_size is not None) and (self.test_size is not None):
                     X_train, X_val, y_train, y_val = train_test_split(
-                        X_train, y_train, test_size=self.val_size, stratify=y_train, random_state=self.SEED
+                        X_train,
+                        y_train,
+                        test_size=self.val_size,
+                        stratify=y_train,
+                        random_state=self.SEED,
                     )
                     X_train = pd.DataFrame(data=X_train, columns=X.columns)
                     y_train = pd.DataFrame(data=y_train, columns=[y.name])
@@ -377,16 +421,21 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             # the logic ensures that y_train is during all training scenarios and inference scenario always the right reference for number of classes.
             tabular_train = self._preprocessing_pipeline(X_train, y_train, stage="fit")
             if self.test_size is not None:
-                tabular_test = self._preprocessing_pipeline(X_test, y_test, stage='inference')
+                tabular_test = self._preprocessing_pipeline(X_test, y_test, stage="inference")
             if (self.val_size is not None) and (self.test_size is not None):
-                tabular_val = self._preprocessing_pipeline(X_val, y_val, stage='inference')
+                tabular_val = self._preprocessing_pipeline(X_val, y_val, stage="inference")
             # n_classes is calculated based on set of unique classes in train, val, test after preprocessing to handle unknown classes properly.
             self.n_classes = len(
-                set(tabular_train[y.name].unique())
-                .union(*(set(df[y.name].unique()) for df in (tabular_val, tabular_test) if df is not None))
+                set(tabular_train[y.name].unique()).union(
+                    *(
+                        set(df[y.name].unique())
+                        for df in (tabular_val, tabular_test)
+                        if df is not None
+                    )
+                )
             )
-        elif stage == 'predict':
-            tabular_predict = self._preprocessing_pipeline(X_pred, y_pred, stage='inference')
+        elif stage == "predict":
+            tabular_predict = self._preprocessing_pipeline(X_pred, y_pred, stage="inference")
 
         # create datasets
         # NOTE: instanziation of datasets (train, val test) in stage == ('fit', 'validate', 'test') is controlled by self.test_size and self.val_size
@@ -480,7 +529,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         Returns:
             DataLoader: Test dataloader
         """
-        if self.stage_setup == 'predict':
+        if self.stage_setup == "predict":
             return DataLoader(
                 self.predict_dataset,
                 batch_size=self.batch_size_inference,
@@ -527,14 +576,18 @@ class MulticlassTabularLightningModule(L.LightningModule):
         y = batch["target"].flatten()  # flatten to match input shape of F.cross_entropy
         y_hat = self.forward(x)
         loss = F.cross_entropy(y_hat, y)
-        y_hat = torch.argmax(y_hat, dim=1) # provides the class with the highest probability to match the shape of y
+        y_hat = torch.argmax(
+            y_hat, dim=1
+        )  # provides the class with the highest probability to match the shape of y
         return (loss, y_hat, y)
 
     def training_step(self, batch, batch_idx) -> torch.Tensor:
         loss, y_hat, y = self._shared_step(batch, batch_idx)
         self.log(f"train_loss", loss)
         self.train_acc(y_hat, y)
-        self.log("train_F1_macro_weighted", self.train_acc, prog_bar=True, on_epoch=True, on_step=False)
+        self.log(
+            "train_F1_macro_weighted", self.train_acc, prog_bar=True, on_epoch=True, on_step=False
+        )
         return loss
 
     def validation_step(self, batch, batch_idx) -> None:
