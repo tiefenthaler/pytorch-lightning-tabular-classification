@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.preprocessing import OrdinalEncoder
 
 # Custom transformer to use attributes from the OrdinalEncoder
 class OrdinalEncoderExtensionUnknowns(BaseEstimator, TransformerMixin, OneToOneFeatureMixin):
-    """OrdinalEncoder Extenstion that handles unknown values given as "-1" and converts them to "0".
+    """OrdinalEncoder Extension that handles unknown values given as "-1" and converts them to "0".
     Shifting the other values by 1 to avoid conflicts with the original values.
     Supports numpy arrays pandas Series and pandas DataFrames as input and output.
     """

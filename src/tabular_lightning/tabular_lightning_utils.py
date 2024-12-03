@@ -1,14 +1,11 @@
-from typing import Dict, Iterable, List, Literal, Optional, Tuple, Union
+from typing import Dict
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 from torch import nn
 
-from .tabular_lightning import (
-    MulticlassTabularLightningModule,
-    TabularDataModuleClassificationPACKAGING,
-)
+from .tabular_lightning import TabularDataModuleClassificationPACKAGING
 
 
 def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None) -> None:
@@ -77,7 +74,6 @@ def print_dataloader_output(dm: TabularDataModuleClassificationPACKAGING = None)
     """
     num_epochs = 1
     for epoch in range(num_epochs):
-
         for batch_idx, dict in enumerate(dm.train_dataloader()):
             print("Batch:", batch_idx)
             if batch_idx >= 1:
@@ -151,7 +147,6 @@ def print_embbeding_input_output(dm: TabularDataModuleClassificationPACKAGING = 
     """
     num_epochs = 1
     for epoch in range(num_epochs):
-
         for batch_idx, dict in enumerate(dm.train_dataloader()):
             print("Batch:", batch_idx)
             if batch_idx >= 1:

@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Literal, Optional, Tuple, Union
+from typing import Literal
 
 import numpy as np
 from lightning.pytorch.callbacks import EarlyStopping

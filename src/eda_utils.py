@@ -1,5 +1,5 @@
 import math
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -46,7 +46,6 @@ def df_column_summary(df: pd.DataFrame = None, numeric_agg: bool = False) -> pd.
     rows = []
     # Loop through each column in the DataFrame
     for column in df.columns:
-
         # General statistics: pre-calculations
         value_counts = df[column].value_counts()
         value_counts_normalized = df[column].value_counts(normalize=True)
