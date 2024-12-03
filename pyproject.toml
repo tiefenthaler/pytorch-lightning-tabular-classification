@@ -1,0 +1,80 @@
+[project]
+name = "ml-packaging-classification"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12.0, <3.13.0"
+dependencies = [
+    "autogluon>=1.2",
+    "bokeh>=3.6.1",
+    "imbalanced-learn>=0.12.4",
+    "ipykernel>=6.29.5",
+    "ipython-genutils>=0.2.0",
+    "ipywidgets>=8.1.5",
+    "jupyter>=1.1.1",
+    "lightgbm>=4.5.0",
+    "lightning>=2.4.0",
+    "matplotlib>=3.7.5",
+    "mlflow>=2.18.0",
+    "notebook>=7.0.7",
+    "numpy>=1.22",
+    "optuna-integration>=4.1.0",
+    "optuna>=4.1.0",
+    "pandas-datareader>=0.10.0",
+    "pandas>=2.0",
+    "pycaret>=3.0",
+    "pyyaml>=6.0.2",
+    "scikit-learn>=1.1",
+    "scipy>=1.11.4",
+    "seaborn>=0.13.2",
+    "torch>=2.4.1"
+]
+
+[dependency-groups]
+dev = [
+    "jupyterlab>=4.3.1",
+    "pytest>=8.1.1",
+    "uv>=0.5.5"
+]
+lint = [
+    "ruff>=0.8.1",
+    "toml-sort>=0.24.2"
+]
+
+[tool.uv]
+# The default dependency groups to include
+default-groups = ["dev", "lint"]
+# to handle missing release versions
+constraint-dependencies = ["kaleido!=0.2.1.post1"]
+
+[tool.uv.sources]
+torchvision = [
+    {index = "pytorch-cpu", marker = "platform_system == 'Darwin'"},
+    {index = "pytorch-cu124", marker = "platform_system == 'Linux'"}
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[tool.pylint.'FORMAT']
+max-line-length = 99
+
+[tool.pytest]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+
+# NOTE: to sort, run: "uv run toml-sort pyproject.toml"
+[tool.tomlsort]
+in_place = true
+no_sort_tables = true
+sort_inline_arrays = true
+spaces_before_inline_comment = 4
+spaces_indent_inline_array = 4
