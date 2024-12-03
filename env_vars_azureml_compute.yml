@@ -1,5 +1,5 @@
 project_directory: "/home/azureuser/ml_packaging_classification/"
-data_directory: "/home/azureuser/ml_packaging_classification//data"
+data_directory: "/home/azureuser/ml_packaging_classification/data"
 pycaret_exp_storage_directory: "/home/azureuser/ml_packaging_classification/experiments_logs/pycaret_exp_storage"
 autogluon_exp_storage_directory: "/home/azureuser/ml_packaging_classification/experiments_logs"
 lightning_exp_storage_directory: "/home/azureuser/ml_packaging_classification/experiments_logs/lightning"
