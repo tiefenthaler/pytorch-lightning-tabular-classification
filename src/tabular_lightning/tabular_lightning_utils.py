@@ -8,7 +8,7 @@ from torch import nn
 from .tabular_lightning import TabularDataModuleClassificationPACKAGING
 
 
-def check_data_consitancy(dm: TabularDataModuleClassificationPACKAGING = None) -> None:
+def check_data_consistency(dm: TabularDataModuleClassificationPACKAGING = None) -> None:
     """Tests the consistency of the data.
     Args:
         dm: pre-processed datamodule from class TabularDataModuleClassificationPACKAGING
