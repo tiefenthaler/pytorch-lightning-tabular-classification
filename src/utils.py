@@ -1,11 +1,9 @@
 # import traceback
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import sklearn
 import sklearn.pipeline
 from numpy import ndarray
@@ -69,7 +67,7 @@ def check_model_learning_CV(
     """Perform cross validation on a given model to analyze the degree of overfitting and underfitting.
     This is achieved by evaluating the macro average f1-score on the training and test sets for each fold.
     The function also returns the used StratifiedKFold object for potential further uses.
-    NOTE: moved inside a function, since transformations and training should not be puplic available
+    NOTE: moved inside a function, since transformations and training should not be public available
     NOTE: ignore warnings of ill-defined F-score, KFold splits might cause labels in y_true might not appear in y_pred
 
     Args:
@@ -134,6 +132,7 @@ def calculate_weighted_cost(
     class_weights: Optional[Dict[int, float]] = None,
 ) -> float:
     """This function calculates the weighted cost for a multi-class classification model based on different averaging methods.
+
     Function's logic:
     Initial Setup: Extract costs for TP, FN, FP, TN from the given 2x2 cost matrix.
     Validation: If class weights are provided, check to ensure they match the classes derived from the confusion matrix.
@@ -151,7 +150,7 @@ def calculate_weighted_cost(
             If not provided, the class distribution derived from the confusion matrix is used for the 'weighted' method. Defaults to None.
 
     Raises:
-        ValueError: Error handeling for "method"
+        ValueError: Error handling for "method"
 
     Returns:
         float: The weighted cost based on the selected averaging method.
