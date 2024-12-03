@@ -86,7 +86,7 @@ Here's a breakdown of each:
 
 # 4. Tabular Multi-Class Classification Use Case
 
-To reach sustainability goals for the packaging of products, the company needs to know to which packaging categories the single items belong to. Since this information is not given for 45.058 items of the total 137.035 items, the goal is to provide the categories for the items with missing ones based on a data-driven approach. The solution should be applied for compareable data sets from multiple origins. First analysis has shown that simple 1:1 relationships and rule-based approaches do not lead to proper results. Therefore, a machine learning approach was used. The goal is to build a solution that is capable of doing a highly accurate prediction for as many packaging categories as possible.  
+To reach sustainability goals for the packaging of products, the company needs to know to which packaging categories the single items belong to. Since this information is not given for 45.058 items of the total 137.035 items, the goal is to provide the categories for the items with missing ones based on a data-driven approach. The solution should be applied for comparable data sets from multiple origins. First analysis has shown that simple 1:1 relationships and rule-based approaches do not lead to proper results. Therefore, a machine learning approach was used. The goal is to build a solution that is capable of doing a highly accurate prediction for as many packaging categories as possible.  
 For more information about the use case look at the [README.MD](https://github.com/tiefenthaler/ml_packaging_classification/blob/main/README.md).
 
 ![Dataset Overview](docs/README_PyTorchLightning_Tutorial/dataset_overview_2.png)
@@ -111,26 +111,26 @@ In this tutorial I demonstrate the usage of Datasets, DataLoaders, LightningData
         First, data operations (like shuffle, split data, categorical encoding, normalization, etc.), which any dataframe should undergo before feeding into the dataloader will be performed here. Since we use sklearn functionalities for our tabular pre-processing pipeline the data input and output of the pre-processing is a tabular format (dataframe) and not a tensor format.
         Second, the outcome of `def setup` are `Dataset` objects for each split (e.g. train, val, test, pred), which is a wrapper around the pre-processed tabular data and provides the samples and their corresponding labels (ideally in tensor format) in a specific way to be compatible for the model(s).
             - `Dataset`
-            Dataset provides the samples and their corresponding labels in a specific way to be compatible for the model(s). We define the input for our tabular use case as a DataFrame, while the output should generally be a tensor. In our case the output is a tuple of tensors representing contious features, categorical features and a tensor for the target variable (label).
-            The class performs specific data type correction for to use of Neural Networks (e.g. ensure that all outputs are numeric values of the correct type depeding of they are categorical or continous nature).
+            Dataset provides the samples and their corresponding labels in a specific way to be compatible for the model(s). We define the input for our tabular use case as a DataFrame, while the output should generally be a tensor. In our case the output is a tuple of tensors representing continuos features, categorical features and a tensor for the target variable (label).
+            The class performs specific data type correction for to use of Neural Networks (e.g. ensure that all outputs are numeric values of the correct type depending of they are categorical or continuous nature).
         - `def train/val/test/prediction_dataloader`
         Creates our dataloaders within the LightningDataModule. See usage below.
             - `DataLoader`
             DataLoader wraps an iterable around the Dataset to enable easy access to the samples during training and inference. The Dataset defines the format of the data that is passed to our model. The DataLoader retrieves our dataset’s features and labels. While training a model, we typically want to pass samples in “minibatches”, reshuffle the data at every epoch to reduce model overfitting, and use Python’s multiprocessing to speed up data retrieval, which is handled by the DataLoader. Input and output is a tensor. https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
-- Excorsion: Classical approach of using `Datasets`, `DataLoaders` & `LightningDataModule` for e.g. images, ...
+- Excursion: Classical approach of using `Datasets`, `DataLoaders` & `LightningDataModule` for e.g. images, ...
     
-    The main difference is the usage of tensors instead of a dataframe for efficent GPU usage.
+    The main difference is the usage of tensors instead of a dataframe for efficient GPU usage.
     
     - `LightningDataModule`
     Our LightningDataModule builds the wrapper around this process. It encapsulates training, validation, testing, and prediction dataloaders, as well as any necessary steps for data processing, downloads, and transformations. https://lightning.ai/docs/pytorch/stable/data/datamodule.html
         - `def prepare_data`
-        Loads the data and does general processing befor transfomring to a tensor, so efficent tensor operations can be enabled in `setup'.
+        Loads the data and does general processing before transforming to a tensor, so efficient tensor operations can be enabled in `setup'.
         - `def setup`
-        Efficent tensor operations (like shuffle, split data, categorical encoding, normalization, etc.), which any dataframe should undergo before feeding into the dataloader.
+        Efficient tensor operations (like shuffle, split data, categorical encoding, normalization, etc.), which any dataframe should undergo before feeding into the dataloader.
         - `def train/val/test_dataloader`
         Creates our dataloaders within the LightningDataModule.
     - `Dataset`
-    Class to create tabular dataset to follow PyTorch Lightning conventions (eventhough we are working on tabular data), where the data for feature variables and the target variable are often already provided in a combined way (e.g. contrary to images and corresbonding labels). For "classical" approaches a Dataset class is often used at the start of the machine learning pipeline to provide the data in a format (e.g. combine images and corresponding labels, which are typically not provided in the same file) for further processing and training.
+    Class to create tabular dataset to follow PyTorch Lightning conventions (even though we are working on tabular data), where the data for feature variables and the target variable are often already provided in a combined way (e.g. contrary to images and corresponding labels). For "classical" approaches a Dataset class is often used at the start of the machine learning pipeline to provide the data in a format (e.g. combine images and corresponding labels, which are typically not provided in the same file) for further processing and training.
 
 ### 5.1.1. Dataset for Tabular Data (Code Implementation)
 
@@ -256,16 +256,16 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
         SEED: Optional[int] = 42,
     ) -> None:
         """
-        The class processes the data accordingly, so that the output meets the requirments to be further use of PyTorch/Lightning.
-        A shareble, reusable class that encapsulates data loading and data preprocessing logic for classification.
-        The class provides general data handeling and very specific data handeling to the 'Packaging Dataset' ('number` and 'object' types as variables are supported, but no other e.g. like 'date').
-        NOTE: In addition, the common/original intention of using a L.LightningDataModule is to performe data operations on tensors to improve compute performance. For our (and most) tabular datasets we neglect this aspect,
+        The class processes the data accordingly, so that the output meets the requirements to be further use of PyTorch/Lightning.
+        A sharable, reusable class that encapsulates data loading and data preprocessing logic for classification.
+        The class provides general data handling and very specific data handling to the 'Packaging Dataset' ('number` and 'object' types as variables are supported, but no other e.g. like 'date').
+        NOTE: In addition, the common/original intention of using a L.LightningDataModule is to perform data operations on tensors to improve compute performance. For our (and most) tabular datasets we neglect this aspect,
             since we perform data transformations, which are not tensor based. Therefore data preprocessing and transformations are organized within the class methods 'prepare_data' and 'setup',
-            based on if they should be performed a single time only or multiple times (e.g. on each split seperately).
+            based on if they should be performed a single time only or multiple times (e.g. on each split separately).
         NOTE: Be aware of the status of your pre-processing pipeline / transformers (data they are fit on) - performance optimization vs. final evaluation vs. inference only.
             The stage parameter ('fit' or 'inference') in def _preprocessing_pipeline controls this internal logic.
         NOTE: Training, validation, testing and prediction are triggered by the Lightning Trainer() methods (.fit(), .validate(), .test() and .predict()).
-            The stage parameter ('fit', 'validate', 'test' and 'predict') controles the internal logic to provide the correct data splitting and dataloader generation.
+            The stage parameter ('fit', 'validate', 'test' and 'predict') controls the internal logic to provide the correct data splitting and dataloader generation.
 
         Args:
             data_dir (str): The directory where the data is stored.
@@ -308,11 +308,11 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
 
     def _prepare_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """
-        Performs general, use case independent data input handeling and data type handling.
+        Performs general, use case independent data input handling and data type handling.
         Used internal in 'prepare_data' for train, val and test dataloaders and in 'inference_dataloader' for prediction.
-        Target specific handelings are performed in 'perpare_data' to avoid conflicts during inference only scenarios where the target is not available.
+        Target specific handlings are performed in 'prepare_data' to avoid conflicts during inference only scenarios where the target is not available.
         General data preparation involves:
-            - transform target variable to data type 'object' for classificatiomn tasks and to data type 'float32' for regression tasks.
+            - transform target variable to data type 'object' for classification tasks and to data type 'float32' for regression tasks.
             - transform continuous feature variables to data type 'np.float32'.
             - transform categorical feature variables to data type 'object'.
             - update the processed dataframe accordingly and drops not specified columns.
@@ -325,7 +325,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             data[self.target] = data[self.target].astype(np.float32).values
 
         if len(self.continuous_cols) > 0:
-            # continuous_cols will be transfomred to float32 ('32' for performance reasons) since NNs do not handle int properly.
+            # continuous_cols will be transformed to float32 ('32' for performance reasons) since NNs do not handle int properly.
             data[self.continuous_cols] = data[self.continuous_cols].astype(np.float32).values
         if len(self.categorical_cols) > 0:
             # ensure that all categorical variables are of type 'object'
@@ -373,7 +373,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             self.preprocess_pipeline.set_output(transform="pandas")
 
             # ordinal is used instead of label encoder to avoid conflicts with inference or
-            # conflicts caused by data splits of categories with low numerber of classesonly scenarios
+            # conflicts caused by data splits of categories with low number of classes only scenarios
             self.label_encoder_target = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
             # self.label_encoder_target = LabelEncoder()
 
@@ -421,14 +421,14 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             # NOTE: Oversampling so each class has at least 100 sample; to properly represent minority classes during training and evaluation
             X = self.data.iloc[:, :-1]
             y = self.data.iloc[:, -1]  # the last column is the target, ensured based on section before (# select a subset)
-            dict_oversmapling = {
+            dict_oversampling = {
                 "Metal Cassette": 100,
                 "Carton tube with or w/o": 100,
                 "Wooden box": 100,
                 "Fabric packaging": 100,
                 "Book packaging": 100,
             }
-            oversampler = RandomOverSampler(sampling_strategy=dict_oversmapling, random_state=self.SEED)
+            oversampler = RandomOverSampler(sampling_strategy=dict_oversampling, random_state=self.SEED)
             X_oversample, y_oversample = oversampler.fit_resample(X, y)
             self.data = pd.concat([X_oversample, y_oversample], axis=1)
 
@@ -444,7 +444,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
 
     def setup(self, stage: str = None) -> None:
         """Data Operations (like shuffle, split data, categorical encoding, normalization, etc.) that will be performed multiple times, which any dataframe should undergo before feeding into the dataloader.
-        Since on tabular data, operations like transformations (categorical encoding, normalization, etc.) needs to be performed with respect to all samples (respectively separat per train, val, test split),
+        Since on tabular data, operations like transformations (categorical encoding, normalization, etc.) needs to be performed with respect to all samples (respectively separate per train, val, test split),
         most operations are not performed in DDP way. See class docstring for further details regarding tabular data and tensor transformations.
 
         Args:
@@ -510,8 +510,8 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
             tabular_predict = self._preprocessing_pipeline(X_pred, y_pred, stage='inference')
 
         # create datasets
-        # NOTE: instanziation of datasets (train, val test) in stage == ('fit', 'validate', 'test') is controlled by self.test_size and self.val_size
-        #       instanziation of datasets (predict) is controlled by stage == 'predict'
+        # NOTE: instantiation of datasets (train, val test) in stage == ('fit', 'validate', 'test') is controlled by self.test_size and self.val_size
+        #       instantiation of datasets (predict) is controlled by stage == 'predict'
         if stage in ("fit", "validate", "test"):
             self.train_dataset = TabularDataset(
                 data=tabular_train,
@@ -595,7 +595,7 @@ class TabularDataModuleClassificationPACKAGING(L.LightningDataModule):
 
     def predict_dataloader(self) -> DataLoader:
         """Dataloader that the Trainer predict() method uses.
-        Used for predictions for data with unknow target (labes).
+        Used for predictions for data with unknown target (labes).
         Args:
             batch_size (Optional[int], optional): Batch size. Defaults to `self.batch_size`.
         Returns:
@@ -843,7 +843,7 @@ class MulticlassTabularCatEmbeddingMLP(nn.Module):
 
         ### define the Embedding MLP ###
         ## embedding layers
-        # cont featurres
+        # cont features
         self.cont_normalizing = nn.BatchNorm1d(len(self.continuous_cols))
         # cat features
         self.cat_embeddings = nn.ModuleDict()
