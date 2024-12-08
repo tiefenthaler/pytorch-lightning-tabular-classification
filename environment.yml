@@ -9,35 +9,41 @@ channels:
 
 dependencies:
 # conda installation
-- python>=3.11
-- ipython_genutils
-- ipykernel
-- ipywidgets
-- jupyterlab
+- python>=3.12
 - pip
 - mamba
-- pyyaml
+- autogluon>=1.2
+- bokeh>=3.6.1
+- imbalanced-learn>=0.12.4
+- ipykernel>=6.29.5
+- ipython-genutils>=0.2.0
+- ipywidgets>=8.1.5
+- jsonschema>=4.21.1
+- jupyter>=1.1.1
+- lightgbm>=4.5.0
+- lightning>=2.4.0
+- matplotlib>=3.7.5
+- mlflow>=2.18.0
+- notebook>=7.0.7
 - numpy>=1.22
-- matplotlib
+- optuna>=4.1.0
+- pandas-datareader>=0.10.0
 - pandas>=2.0
-- pandas-datareader
+- pycaret
+- pyyaml>=6.0.2
 - scikit-learn>=1.1
-- scipy
-- seaborn
-- bokeh
-- lightgbm
-- pytorch
-- lightning
-- optuna
-- imbalanced-learn
-- mlflow
-- pycaret>=3.0
-- autogluon
-- pytest
+- scipy>=1.11.4
+- seaborn>=0.13.2
+- torch>=2.4.1
+- jupyterlab>=4.3.1
+- pytest>=8.1.1
+
 - pip:
   # pip installation
   # - optuna.integration
   - black
   - 'black[jupyter]'
   - isort
-  - optuna.integration
+  - optuna.integration>=4.1.0
+  - uv>=0.5.5
+  - ruff
